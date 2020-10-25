@@ -2,17 +2,103 @@
 	<head>
 		<title>CO2-Ampel</title>
 		<meta charset="utf-16">
-
 		<style>
-			
+			body {
+				background-color: black;
+				color: white;
+				padding: 0;
+				margin: 0;
+			}
+			svg {
+				stroke-width: 5px;
+				margin: 5px;
+				padding: 5px;
+			}
+			.frame {
+				stroke: #a0a0a0;
+			}
+			.graph {
+				stroke: #22aaff;
+				fill: url(#graphfill);
+			}
 		</style>
 	</head>
 
 	<body>
-
-
-		<script>
-
-		</script>
+		<svg id="svgCont" width="100%" height="100%">
+			<polygon class="graph" id="graph" data-min="0" data-values="1,1,1,2,1"/>
+			<polygon class="frame" id="frame"/>
+			<defs>
+				<linearGradient id="graphfill" x1="0" x2="0" y1="0" y2="1">
+					<stop offset="0.2" stop-color="#ff6666"/>
+					<stop offset="1" stop-color="#00ff88"/>
+				</linearGradient>
+			</defs>
+		</svg>
 	</body>
+
+	<script>
+		window.onload = createReferences;
+		window.onpageshow = setup;
+		window.onresize = ()=>{buildFrame();buildGraph()};
+
+		let svgCont;
+		let frame;
+		let graph;
+
+		let height;
+		let width;
+
+		function createReferences() {
+			svgCont = document.getElementById('svgCont');
+			frame = document.getElementById('frame');
+			graph = document.getElementById('graph');
+		}
+		
+		function setup() {
+			buildFrame();
+			buildGraph();
+		}
+
+		function buildFrame() {
+			height = svgCont.clientHeight - 30;
+			width = svgCont.clientWidth - 30;
+			frame.setAttribute('points', `0,0 0,${height} ${width},${height} 0,${height}`);
+		}
+
+		function buildGraph() {
+			const values = parseValues();
+			var min = values[0];
+			var max = values[0];
+			for (i=0; i<values.length;i++) {
+				if (graph.getAttribute('data-min')) {
+					min = graph.getAttribute('data-min');
+				} else {
+					if (values[i] < min) min = values[i];
+				}
+				if (graph.getAttribute('data-max')) {
+					min = graph.getAttribute('data-max');
+				} else {
+					if (values[i] > max) max = values[i];
+				}
+			}
+			let points = '';
+			points += `0,${height} `;
+			for(i=0;i<values.length;i++){
+				points += `${(width/(values.length-1))*i},${height*(1-((values[i]-min)/max))} `;
+			}
+			points += `${width},${height} `;
+			console.log(points);
+			graph.setAttribute('points', points);
+		}
+
+		function parseValues() {
+			const vals = graph.getAttribute('data-values').split(',');
+			for(i=0;i<vals.length;i++){
+				vals[i] = parseInt(vals[i]);
+			}
+			return vals;
+		}
+
+	</script>
 </html>
