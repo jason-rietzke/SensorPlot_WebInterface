@@ -64,7 +64,7 @@
 		</svg>
 
 		<svg id='graphContainer' width='100%' height='100%'>
-			<polygon id='graph' data-min='0' date-max='2000' data-clipping='false' data-stepsize='100' data-dencity='5' data-values='200,220,230,250,260,280,320,370,440,550,700,890,1200,1700,920,340,120,100,110,130,150,170'/>
+			<polygon id='graph' data-min='0' data-max='2000' data-clipping='false' data-stepsize='100' data-dencity='5' data-values='200,220,230,250,260,280,320,370,440,550,700,890,1200,1700,920,340,120,100,110,130,150,170'/>
 			<polygon id='frame'/>
 			<defs>
 				<linearGradient id='graphfill' x1='0' x2='0' y1='0' y2='1'>
@@ -163,16 +163,16 @@
 			
 			if (graph.getAttribute('data-clipping')==='false') {
 				if (min>graph.getAttribute('data-min')) {
-					min = graph.getAttribute('data-min');
+					if (graph.getAttribute('data-min')) min = graph.getAttribute('data-min');
 				}
 				if (max<graph.getAttribute('data-max')) {
-					max = graph.getAttribute('data-max');
+					if (graph.getAttribute('data-max')) max = graph.getAttribute('data-max');
 				}
 			} else {
 				if (graph.getAttribute('data-min')) min = graph.getAttribute('data-min');
 				if (graph.getAttribute('data-max')) max = graph.getAttribute('data-max');
 			}
-			
+
 			let points = '';
 			points += `0,${height} `;
 			for(i=0;i<values.length;i++){
