@@ -40,23 +40,31 @@
 				-webkit-transition: all var(--animationTime) ease-in-out;
 			}
 
-			#graphContainer {
+			.graphContainer {
 				max-width: 80vw;
 				max-height: 80vh;
 				margin-top: 10vh;
 				margin-left: 10vw;
 			}
-			#frame {
+			.frame {
 				fill: none;
 				stroke: #a0a0a0;
 				stroke-linecap: round;
 			}
-			#graph {
+			.graph {
 				stroke: #f0f0f0;
 			}
 			.label {
 				fill: white;
-				font-size: 1.2vh;
+				font-size: 14px;
+			}
+			.detailPointer {
+				stroke: #d0d0d0;
+				stroke-width: 2px;
+			}
+			.detailLabel {
+				stroke: #d0d0d0;
+				stroke-width: 2px;
 			}
 		</style>
 	</head>
@@ -70,9 +78,9 @@
 			<path id='mouth'/>
 		</svg>
 
-		<svg id='graphContainer' width='100%' height='100%'>
-			<polygon id='graph' data-min='0' data-max='2000' data-clipping='false' data-stepsize='200' data-dencity='5' data-values='200,220,230,250,260,280,320,370,440,550,700,890,1200,1700,920,340,120,100,110,130,150,170'/>
-			<polygon id='frame'/>
+		<svg class='graphContainer' width='100%' height='100%'>
+			<polygon class='graph' data-min='0' data-max='2000' data-clipping='false' data-stepsize='200' data-dencity='5' data-values='200,220,230,250,260,280,320,370,440,550,700,890,1200,1700,920,340,120,100,110,130,150,170'/>
+			<polygon class='frame'/>
 			<defs>
 				<linearGradient id='graphfill' x1='0' x2='0' y1='0' y2='1'>
 					<stop offset='0.2' stop-color='#ff6666'/>
@@ -86,7 +94,7 @@
 	<script>
 		window.onload = createReferences;
 		window.onpageshow = setup;
-		window.onresize = ()=>{setMouth();buildFrame();buildGraph();buildLabels();};
+		window.onresize = ()=>{setMouth();buildFrame();buildGraph();buildLabels();}
 
 		const SmileyState = {
 			Happy: 'Happy',
@@ -112,9 +120,9 @@
 			smiley = document.getElementById('smiley');
 			mouth = document.getElementById('mouth');
 
-			graphContainer = document.getElementById('graphContainer');
-			frame = document.getElementById('frame');
-			graph = document.getElementById('graph');
+			graphContainer = document.getElementsByClassName('graphContainer')[0];
+			frame = document.getElementsByClassName('frame')[0];
+			graph = document.getElementsByClassName('graph')[0];
 		}
 		
 		function setup() {
@@ -128,6 +136,7 @@
 			buildFrame();
 			buildGraph();
 			buildLabels();
+			detailedView();
 		}
 
 		function setMouth() {
@@ -161,7 +170,7 @@
 		function buildFrame() {
 			height = graphContainer.clientHeight;
 			width = graphContainer.clientWidth;
-			frame.setAttribute('points', `30,0 30,${height} ${width},${height} 30,${height}`);
+			frame.setAttribute('points', `40,0 40,${height} ${width},${height} 40,${height}`);
 		}
 
 		function buildLabels() {
@@ -178,7 +187,7 @@
 				label.textContent = j;
 				graphContainer.appendChild(label);
 				label.classList.add('label');
-				label.setAttribute('x',22-label.getBBox().width);
+				label.setAttribute('x',35-label.getBBox().width);
 				label.setAttribute('y',yPos);
 			}
 			labels = document.getElementsByClassName('label')
@@ -212,12 +221,12 @@
 			}
 
 			let points = '';
-			points += `30,${height} `;
-			width = width - 30;
+			points += `40,${height} `;
+			width = width - 40;
 			for(i=0;i<values.length;i++){
-				points += `${(width/(values.length-1))*i + 30},${height*(1-((values[i]-min)/max))} `;
+				points += `${(width/(values.length-1))*i + 40},${height*(1-((values[i]-min)/max))} `;
 			}
-			points += `${width + 30},${height} `;
+			points += `${width + 40},${height} `;
 			graph.setAttribute('points', points);
 		}
 
@@ -227,6 +236,74 @@
 				vals[i] = parseInt(vals[i]);
 			}
 			return vals;
+		}
+
+		function detailedView() {
+			const values = parseValues();
+			document.addEventListener('mousemove', function(e){
+				const top = graph.getBoundingClientRect().top + document.body.scrollTop;
+				const bottom = graph.getBoundingClientRect().bottom + document.body.scrollTop;
+				const left = graph.getBoundingClientRect().left + document.body.scrollLeft;
+				const right = graph.getBoundingClientRect().right + document.body.scrollLeft;
+				if(e.pageX>left && e.pageX<right && e.pageY>top && e.pageY<bottom){
+					const perc = (e.offsetX-40)/graph.getBBox().width;
+					const i = parseInt(values.length*perc);
+					createDetailedPointer(parseInt(graph.getBBox().width*perc)+40);
+					createDetailedLabel(parseInt(graph.getBBox().width*perc)+40, values, i);
+				}else{
+					if(document.getElementById('detailPointer')){document.getElementById('detailPointer').remove();}
+					if(document.getElementById('detailLabelRect')){document.getElementById('detailLabelRect').remove();}
+					if(document.getElementById('detailLabelText')){document.getElementById('detailLabelText').remove();}
+				}
+			}, false);
+		}
+		function createDetailedPointer(pos) {
+			if(document.getElementById('detailPointer')){document.getElementById('detailPointer').remove();}
+			const poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+			poly.classList.add('detailPointer');
+			poly.setAttribute('id', 'detailPointer');
+			graphContainer.appendChild(poly);
+			const p1 = graphContainer.createSVGPoint();
+			p1.x = pos;
+			p1.y = height;
+			const p2 = graphContainer.createSVGPoint();
+			p2.x = pos;
+			p2.y = 0;
+			poly.points.appendItem(p1);
+			poly.points.appendItem(p2);
+		}
+		function createDetailedLabel(pos, values, index) {
+			if(document.getElementById('detailLabelRect')){document.getElementById('detailLabelRect').remove();}
+			const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+			rect.classList.add('detailLabel');
+			rect.setAttribute('id', 'detailLabelRect');
+			graphContainer.appendChild(rect);
+			rect.setAttribute('width', 120);
+			rect.setAttribute('height', 40);
+			rect.setAttribute('rx', 10);
+			rect.setAttribute('y', 0);
+			rect.setAttribute('x', pos-(rect.getBBox().width/2));
+
+			// offset correction on boundries
+			if ((rect.getBBox().x+rect.getBBox().width) > (graph.getBBox().x+graph.getBBox().width)) { rect.setAttribute('x', ((graph.getBBox().x+graph.getBBox().width)-rect.getBBox().width))}
+			if (rect.getBBox().x < 40) { rect.setAttribute('x', 40)}
+
+			if(document.getElementById('detailLabelText')){document.getElementById('detailLabelText').remove();}
+			const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+			text.classList.add('label');
+			text.setAttribute('id', 'detailLabelText');
+			graphContainer.appendChild(text);
+
+			const ppt = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+			ppt.textContent = 'ppt: '+values[index];
+			ppt.setAttribute('x', rect.getBBox().x + 5);
+			ppt.setAttribute('y', rect.getBBox().y + 15);
+			const time = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+			time.textContent = 'at '+'14:45';
+			time.setAttribute('x', rect.getBBox().x + 5);
+			time.setAttribute('y', rect.getBBox().y + 32);
+			text.appendChild(ppt)
+			text.appendChild(time);
 		}
 
 	</script>
