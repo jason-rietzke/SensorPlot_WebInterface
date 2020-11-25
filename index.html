@@ -3,29 +3,40 @@
 		<title>CO2-Ampel</title>
 		<meta charset='utf-16'>
 		<link rel="stylesheet" href="style.css">
-		<script async defer src="app.js"></script>
+		<script defer src="app.js"></script>
 	</head>
 
 	<body>
 
-		<svg id='smiley'>
-			<circle id='face' cx='50%' cy='50%' r='20vh'/>
-			<circle class='eye' cx='35%' cy='35%' r='2.2vh'/>
-			<circle class='eye' cx='65%' cy='35%' r='2.2vh'/>
-			<path id='mouth'/>
-		</svg>
+		<div class='container'>
+			<svg class='smiley' id='smiley'>
+				<circle class='face' cx='50%' cy='50%'/>
+				<circle class='eye' cx='35%' cy='35%'/>
+				<circle class='eye' cx='65%' cy='35%' r='2.2vh'/>
+				<path class='mouth' id='mouth'/>
+			</svg>
+			<div class='measurements'>
+				<h1>Aktuelle Messwerte</h1>
+				<p><span class='value'>CO2 Konzentration:</span> <span id='currVal-co2'>170</span> ppt</p>
+				<p><span class='value'>Luftfeuchtigkeit:</span> <span id='currVal-hum'>63,7</span> %</p>
+				<p><span class='value'>Temperatur:</span> <span id='currVal-temp'>21,4</span> C°</p>
+			</div>
+		</div>
 
-		<svg class='graphContainer' width='100%' height='100%'>
-			<polygon class='graph' data-min='0' data-max='2000' data-clipping='false' data-stepsize='200' data-dencity='5' data-values='200,220,230,250,260,280,320,370,440,550,700,890,1200,1700,920,340,120,100,110,130,150,170'/>
-			<polygon class='frame'/>
-			<defs>
-				<linearGradient id='graphfill' x1='0' x2='0' y1='0' y2='1'>
-					<stop offset='0.2' stop-color='#ff6666'/>
-					<stop offset='1' stop-color='#00ff88'/>
-				</linearGradient>
-			</defs>
-			<text class='label' x='0' y='10'>2000</text>
-		</svg>
+		<div class='container'>
+			<h1>CO2 Konzentration</h1>
+			<svg class='graphContainer' width='100%' height='100%'>
+				<polygon class='graph' data-min='0' data-max='2000' data-clipping='false' data-stepsize='200' data-dencity='5' data-values='200,220,230,250,260,280,320,370,440,550,700,890,1200,1700,920,340,120,100,110,130,150,170'/>
+				<polygon class='frame'/>
+				<defs>
+					<linearGradient id='graphfill' x1='0' x2='0' y1='0' y2='1'>
+						<stop offset='0.2' stop-color='#ff6666'/>
+						<stop offset='1' stop-color='#00ff88'/>
+					</linearGradient>
+				</defs>
+				<text class='label' x='0' y='10'>2000</text>
+			</svg>
+		</div>
+
 	</body>
-
 </html>

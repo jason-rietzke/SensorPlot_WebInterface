@@ -73,6 +73,11 @@ function setMouthState() {
 }
 
 
+function createGraph() {
+	
+}
+
+
 function buildFrame() {
 	height = graphContainer.clientHeight;
 	width = graphContainer.clientWidth;

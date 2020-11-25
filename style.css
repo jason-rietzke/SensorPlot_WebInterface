@@ -1,39 +1,129 @@
 * {
 	font-family: -apple-system, BlinkMacSystemFont, sans-serif;
 }
+
+/*Lightmode*/
+@media(prefers-color-scheme: light) {
+	* {
+		--backgroundPrimaryColor: #f0f0fa;
+		--backgroundSecondaryColor: #e0e0ea;
+		--foregroundPrimaryColor: #10101a;
+		--foregroundSecondaryColor: #30303a;
+	}
+}
+/*Darkmode*/
+@media(prefers-color-scheme: dark) {
+	* {
+		--backgroundPrimaryColor: #0a0a1a;
+		--backgroundSecondaryColor: #181828;
+		--foregroundPrimaryColor: #d0d0da;
+		--foregroundSecondaryColor: #a0a0aa;
+	}
+}
+
+/*Desktop Aspects*/
+@media (min-width: 750px) {
+	* {
+		--outterViewWidth: calc(100vw - 120px);
+		--outterMargin: 40px;
+		--outterPadding: 20px;
+
+		--smileySize: 250px;
+		--smileyFloat: left;
+		--smileyMarginLeft: 0;
+	}
+}
+/*Mobile Aspects*/
+@media (max-width: 750px) {
+	* {
+		--outterViewWidth: calc(100vw - 60px);
+		--outterMargin: 20px;
+		--outterPadding: 10px;
+
+		--smileySize: 350px;
+		--smileyFloat: none;
+		--smileyMarginLeft: calc((var(--outterViewWidth)/2) - (var(--smileySize)/2));
+	}
+}
+
+
 body {
-	background-color: black;
-	color: white;
+	background-color: var(--backgroundPrimaryColor);
+	color: var(--foregroundPrimaryColor);
 	padding: 0;
 	margin: 0;
+	margin-bottom: var(--outterMargin);
 	transition: all 0.3s;
 	-webkit-transition: all 0.3s;
 }
-svg {
-	stroke-width: 5px;
-	margin: 20px;
+h1 {
+	color: var(--foregroundSecondaryColor);
+	font-weight: 800;
+	font-size: 32px;
+}
+h2 {
+	color: var(--foregroundSecondaryColor);
+	font-weight: 600;
+	font-size: 24px;
 }
 
-#smiley {
-	margin-left: calc(50vw - 20vh);
-	width: 40vh;
-	height: 40vh;
+
+.container {
+	width: var(--outterViewWidth);
+	margin: var(--outterMargin);
+	margin-bottom: calc(var(--outterMargin)/2);
+	padding: var(--outterPadding);
+	background-color: var(--backgroundSecondaryColor);
+	border-radius: 25px;
+	clear: both;
+	overflow: hidden;
 }
-#face {
-	fill: gold;
+
+
+/*Smiley Props*/
+.smiley {
+	height: var(--smileySize);
+	width: var(--smileySize);
+	margin-left: var(--smileyMarginLeft);
+	float: var(--smileyFloat);
+}
+.face {
+	fill: #ffe600;
+	r: calc(var(--smileySize)/2);
 }
 .eye {
-	fill: black;
+	fill: #000000;
+	r: calc(var(--smileySize)/15);
 }
-#mouth {
+.mouth {
 	fill: none;
-	stroke: #000;
-	stroke-width: 1.5vh;
+	stroke: #000000;
+	stroke-width: calc(var(--smileySize)/20);
 	stroke-linecap: round;
 	--animationTime: 0.5s;
 	transition: all var(--animationTime) ease-in-out;
 	-webkit-transition: all var(--animationTime) ease-in-out;
 }
+
+.measurements {
+	margin: var(--outterMargin);
+	color: var(--foregroundPrimaryColor);
+	font-weight: 500;
+	font-size: 16px;
+}
+.measurements .value {
+	color: var(--foregroundSecondaryColor);
+	font-weight: 600;
+}
+
+
+svg {
+	stroke-width: 5px;
+	margin: 20px;
+}
+
+
+
 
 .graphContainer {
 	max-width: 80vw;
@@ -43,21 +133,22 @@ svg {
 }
 .frame {
 	fill: none;
-	stroke: #a0a0a0;
+	stroke: var(--foregroundSecondaryColor);
 	stroke-linecap: round;
 }
 .graph {
-	stroke: #f0f0f0;
+	stroke: var(--foregroundPrimaryColor);
+	fill: none;
 }
 .label {
-	fill: white;
+	fill: var(--foregroundPrimaryColor);
 	font-size: 14px;
 }
 .detailPointer {
-	stroke: #d0d0d0;
+	stroke: var(--foregroundPrimaryColor);
 	stroke-width: 2px;
 }
 .detailLabel {
-	stroke: #d0d0d0;
+	stroke: var(--foregroundPrimaryColor);
 	stroke-width: 2px;
 }
