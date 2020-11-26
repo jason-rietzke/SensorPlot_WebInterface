@@ -79,11 +79,23 @@ h2 {
 	overflow: hidden;
 }
 
+.measurements {
+	margin: var(--outterMargin);
+	color: var(--foregroundPrimaryColor);
+	font-weight: 500;
+	font-size: 16px;
+}
+.measurements .value {
+	color: var(--foregroundSecondaryColor);
+	font-weight: 600;
+}
 
-/*Smiley Props*/
+
+/*Smiley*/
 .smiley {
 	height: var(--smileySize);
 	width: var(--smileySize);
+	margin: var(--outterMargin);
 	margin-left: var(--smileyMarginLeft);
 	float: var(--smileyFloat);
 }
@@ -105,40 +117,23 @@ h2 {
 	-webkit-transition: all var(--animationTime) ease-in-out;
 }
 
-.measurements {
-	margin: var(--outterMargin);
-	color: var(--foregroundPrimaryColor);
-	font-weight: 500;
-	font-size: 16px;
-}
-.measurements .value {
-	color: var(--foregroundSecondaryColor);
-	font-weight: 600;
-}
 
-
-svg {
-	stroke-width: 5px;
-	margin: 20px;
-}
-
-
-
-
+/*Graph*/
 .graphContainer {
-	max-width: 80vw;
-	max-height: 80vh;
-	margin-top: 10vh;
-	margin-left: 10vw;
+	width: 100%;
+	height: 75vh;
 }
 .frame {
 	fill: none;
 	stroke: var(--foregroundSecondaryColor);
+	stroke-width: 5px;
 	stroke-linecap: round;
 }
 .graph {
-	stroke: var(--foregroundPrimaryColor);
 	fill: none;
+	stroke: var(--foregroundPrimaryColor);
+	stroke-width: 5px;
+	stroke-linecap: round;
 }
 .label {
 	fill: var(--foregroundPrimaryColor);
@@ -146,9 +141,12 @@ svg {
 }
 .detailPointer {
 	stroke: var(--foregroundPrimaryColor);
-	stroke-width: 2px;
+	stroke-width: 3px;
+	stroke-linecap: round;
 }
 .detailLabel {
+	fill: var(--backgroundSecondaryColor);
 	stroke: var(--foregroundPrimaryColor);
-	stroke-width: 2px;
+	stroke-width: 3px;
+	stroke-linecap: round;
 }
