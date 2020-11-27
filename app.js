@@ -1,6 +1,9 @@
 window.onload = createReferences;
 window.onpageshow = setup;
-window.onresize = ()=>{setMouth();buildFrame();buildGraph();buildLabels();}
+window.onresize = ()=>{
+	setMouth();
+	createGraphs();
+}
 
 const SmileyState = {
 	Happy: 'Happy',
@@ -12,23 +15,10 @@ let state = SmileyState.Happy;
 let smiley;
 let mouth;
 
-let graphContainer;
-let frame;
-let graph;
-
-let min;
-let max;
-
-let height;
-let width;
 
 function createReferences() {
 	smiley = document.getElementById('smiley');
 	mouth = document.getElementById('mouth');
-
-	graphContainer = document.getElementsByClassName('graphContainer')[0];
-	frame = document.getElementsByClassName('frame')[0];
-	graph = document.getElementsByClassName('graph')[0];
 }
 
 function setup() {
@@ -39,10 +29,7 @@ function setup() {
 		setMouth();
 	}, 500);
 
-	buildFrame();
-	buildGraph();
-	buildLabels();
-	detailedView();
+	createGraphs();
 }
 
 function setMouth() {
@@ -73,30 +60,60 @@ function setMouthState() {
 }
 
 
-function createGraph() {
-	
+function createGraphs() {
+	const graphContainers = document.getElementsByClassName('graphContainer');
+	for(var i = 0; i < graphContainers.length; i++) {
+		let container = graphContainers[i];
+		let graph = container.getElementsByClassName('graph')[0];
+		let frame = container.getElementsByClassName('frame')[0];
+
+		let height = container.clientHeight;
+		let width = container.clientWidth;
+
+		// Min, Max Values
+		let values = parseValues(graph);
+		let min = values[0];
+		let max = values[0];
+		for (var j=0; j<values.length; j++) {
+			if (values[j] < min) min = values[j];
+			if (values[j] > max) max = values[j];
+		}
+		if (graph.getAttribute('data-clipping')==='false') {
+			if (min>graph.getAttribute('data-min')) {
+				if (graph.getAttribute('data-min')) min = graph.getAttribute('data-min');
+			}
+			if (max<graph.getAttribute('data-max')) {
+				if (graph.getAttribute('data-max')) max = graph.getAttribute('data-max');
+			}
+		} else {
+			if (graph.getAttribute('data-min')) min = graph.getAttribute('data-min');
+			if (graph.getAttribute('data-max')) max = graph.getAttribute('data-max');
+		}
+
+		buildFrame(container, frame, height, width);
+		buildGraph(graph, values, min, max, height, width);
+		buildLabels(container, graph, min, max, height, width);
+		detailedView(i, container, graph, frame, values);
+	}
 }
 
 
-function buildFrame() {
-	height = graphContainer.clientHeight;
-	width = graphContainer.clientWidth;
+function buildFrame(container, frame, height, width) {
 	frame.setAttribute('points', `40,0 40,${height} ${width},${height} 40,${height}`);
 }
-
-function buildLabels() {
-	let labels = document.getElementsByClassName('label');
+function buildLabels(container, graph, min, max, height, width) {
+	let labels = container.getElementsByClassName('label');
 	for(i=labels.length-1;i>=0;i--) {
 		labels[i].remove();
 	}
 	const stepSize = parseInt(graph.getAttribute('data-stepsize'));
-	min = parseInt(min);
-	max = parseInt(max);
+	min = parseFloat(min);
+	max = parseFloat(max);
 	for(j=min;j<=max;j+=stepSize) {
 		const yPos = height-((j/max)*height);
 		const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
 		label.textContent = j;
-		graphContainer.appendChild(label);
+		container.appendChild(label);
 		label.classList.add('label');
 		label.setAttribute('x',35-label.getBBox().width);
 		label.setAttribute('y',yPos);
@@ -109,28 +126,7 @@ function buildLabels() {
 	const labelBottom = labels[0];
 	labelBottom.setAttribute('y',height-(labelTop.getBBox().height/2));
 }
-
-function buildGraph() {
-	const values = parseValues();
-	min = values[0];
-	max = values[0];
-	for (i=0; i<values.length;i++) {
-		if (values[i] < min) min = values[i];
-		if (values[i] > max) max = values[i];
-	}
-	
-	if (graph.getAttribute('data-clipping')==='false') {
-		if (min>graph.getAttribute('data-min')) {
-			if (graph.getAttribute('data-min')) min = graph.getAttribute('data-min');
-		}
-		if (max<graph.getAttribute('data-max')) {
-			if (graph.getAttribute('data-max')) max = graph.getAttribute('data-max');
-		}
-	} else {
-		if (graph.getAttribute('data-min')) min = graph.getAttribute('data-min');
-		if (graph.getAttribute('data-max')) max = graph.getAttribute('data-max');
-	}
-
+function buildGraph(graph, values, min, max, height, width) {
 	let points = '';
 	points += `40,${height} `;
 	width = width - 40;
@@ -141,54 +137,56 @@ function buildGraph() {
 	graph.setAttribute('points', points);
 }
 
-function parseValues() {
+function parseValues(graph) {
 	const vals = graph.getAttribute('data-values').split(',');
 	for(i=0;i<vals.length;i++){
-		vals[i] = parseInt(vals[i]);
+		vals[i] = parseFloat(vals[i]);
 	}
 	return vals;
 }
 
-function detailedView() {
-	const values = parseValues();
+function detailedView(i, container, graph, frame, values) {
+	document.removeEventListener('mousemove', function(e){});
 	document.addEventListener('mousemove', function(e){
-		const top = graph.getBoundingClientRect().top + document.body.scrollTop;
-		const bottom = graph.getBoundingClientRect().bottom + document.body.scrollTop;
-		const left = graph.getBoundingClientRect().left + document.body.scrollLeft;
-		const right = graph.getBoundingClientRect().right + document.body.scrollLeft;
+		const top = frame.getBoundingClientRect().top + document.body.scrollTop;
+		const bottom = frame.getBoundingClientRect().bottom + document.body.scrollTop;
+		const left = frame.getBoundingClientRect().left + document.body.scrollLeft;
+		const right = frame.getBoundingClientRect().right + document.body.scrollLeft;
 		if(e.pageX>left && e.pageX<right && e.pageY>top && e.pageY<bottom){
-			const perc = (e.offsetX-40)/graph.getBBox().width;
-			const i = parseInt(values.length*perc);
-			createDetailedPointer(parseInt(graph.getBBox().width*perc)+40);
-			createDetailedLabel(parseInt(graph.getBBox().width*perc)+40, values, i);
+			const perc = (e.offsetX-40)/frame.getBBox().width;
+			const valueIndex = parseInt(values.length*perc);
+			createDetailedPointer(i, container, parseInt(frame.getBBox().width*perc)+40);
+			createDetailedLabel(i, container, graph, parseInt(frame.getBBox().width*perc)+40, values, valueIndex);
 		}else{
-			if(document.getElementById('detailPointer')){document.getElementById('detailPointer').remove();}
-			if(document.getElementById('detailLabelRect')){document.getElementById('detailLabelRect').remove();}
-			if(document.getElementById('detailLabelText')){document.getElementById('detailLabelText').remove();}
+			if(document.getElementById('detailPointer'+i)){document.getElementById('detailPointer'+i).remove();}
+			if(document.getElementById('detailLabelRect'+i)){document.getElementById('detailLabelRect'+i).remove();}
+			if(document.getElementById('detailLabelText'+i)){document.getElementById('detailLabelText'+i).remove();}
 		}
 	}, false);
 }
-function createDetailedPointer(pos) {
-	if(document.getElementById('detailPointer')){document.getElementById('detailPointer').remove();}
+function createDetailedPointer(i, container, pos) {
+	var height = container.clientHeight;
+	var width = container.clientWidth;
+	if(document.getElementById('detailPointer'+i)){document.getElementById('detailPointer'+i).remove();}
 	const poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
 	poly.classList.add('detailPointer');
-	poly.setAttribute('id', 'detailPointer');
-	graphContainer.appendChild(poly);
-	const p1 = graphContainer.createSVGPoint();
+	poly.setAttribute('id', 'detailPointer'+i);
+	container.appendChild(poly);
+	const p1 = container.createSVGPoint();
 	p1.x = pos;
 	p1.y = height;
-	const p2 = graphContainer.createSVGPoint();
+	const p2 = container.createSVGPoint();
 	p2.x = pos;
 	p2.y = 0;
 	poly.points.appendItem(p1);
 	poly.points.appendItem(p2);
 }
-function createDetailedLabel(pos, values, index) {
-	if(document.getElementById('detailLabelRect')){document.getElementById('detailLabelRect').remove();}
+function createDetailedLabel(i, container, graph, pos, values, valueIndex) {
+	if(document.getElementById('detailLabelRect'+i)){document.getElementById('detailLabelRect'+i).remove();}
 	const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
 	rect.classList.add('detailLabel');
-	rect.setAttribute('id', 'detailLabelRect');
-	graphContainer.appendChild(rect);
+	rect.setAttribute('id', 'detailLabelRect'+i);
+	container.appendChild(rect);
 	rect.setAttribute('width', 120);
 	rect.setAttribute('height', 40);
 	rect.setAttribute('rx', 10);
@@ -199,14 +197,14 @@ function createDetailedLabel(pos, values, index) {
 	if ((rect.getBBox().x+rect.getBBox().width) > (graph.getBBox().x+graph.getBBox().width)) { rect.setAttribute('x', ((graph.getBBox().x+graph.getBBox().width)-rect.getBBox().width))}
 	if (rect.getBBox().x < 40) { rect.setAttribute('x', 40)}
 
-	if(document.getElementById('detailLabelText')){document.getElementById('detailLabelText').remove();}
+	if(document.getElementById('detailLabelText'+i)){document.getElementById('detailLabelText'+i).remove();}
 	const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
 	text.classList.add('label');
-	text.setAttribute('id', 'detailLabelText');
-	graphContainer.appendChild(text);
+	text.setAttribute('id', 'detailLabelText'+i);
+	container.appendChild(text);
 
 	const ppt = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-	ppt.textContent = 'ppt: '+values[index];
+	ppt.textContent = values[valueIndex];
 	ppt.setAttribute('x', rect.getBBox().x + 5);
 	ppt.setAttribute('y', rect.getBBox().y + 15);
 	const time = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');

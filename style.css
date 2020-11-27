@@ -31,6 +31,8 @@
 		--smileySize: 250px;
 		--smileyFloat: left;
 		--smileyMarginLeft: 0;
+
+		--graphHeight: 500px;
 	}
 }
 /*Mobile Aspects*/
@@ -43,6 +45,8 @@
 		--smileySize: 350px;
 		--smileyFloat: none;
 		--smileyMarginLeft: calc((var(--outterViewWidth)/2) - (var(--smileySize)/2));
+
+		--graphHeight: 600px;
 	}
 }
 
@@ -120,8 +124,9 @@ h2 {
 
 /*Graph*/
 .graphContainer {
-	width: 100%;
-	height: 75vh;
+	width: calc(100% - (var(--outterMargin)*2));
+	height: var(--graphHeight);
+	margin: var(--outterMargin);
 }
 .frame {
 	fill: none;
