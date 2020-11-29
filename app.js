@@ -30,7 +30,30 @@ function setup() {
 	}, 500);
 
 	createGraphs();
+
+	// initialize loading data from server
+	const graphContainers = document.getElementsByClassName('graphContainer');
+	for(var i = 0; i < graphContainers.length; i++) {
+		let container = graphContainers[i];
+		let graph = container.getElementsByClassName('graph')[0];
+		loadData(graph, container.getAttribute('data-interval'), container.getAttribute('data-slag'), 1);
+	}
 }
+
+// loading data from server
+function loadData(graph, interval, slag, immediate = 0) {
+	setTimeout(() => {
+		var client = new XMLHttpRequest();
+		client.open('GET', '/'+slag);
+		client.onreadystatechange = function() {
+			graph.setAttribute('data-values', client.responseText);
+			createGraphs();
+		}
+		client.send();
+		loadData(graph, interval, slag)
+	}, immediate ? 0 : (interval * 1000));
+}
+
 
 function setMouth() {
 	const c = parseInt(smiley.clientWidth / 2);

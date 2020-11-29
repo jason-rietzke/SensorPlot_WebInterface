@@ -1,11 +1,22 @@
 # CO2 Ampel
 
+## GraphContainer Properties
+> Das SVG Element des GraphContainers kann mit Attributen ausgestattet werden, die verschiedene Metadatan anführen
+
+#### data-slag:
+Gibt die URL an, an die die request für neue data-values gesendet wird.
+
+#### data-interval:
+Gibt in Sekunden an, in welchem Interval auf die gegebene URL eine request gesendet werden soll, um die Daten regelmäßig nach zu laden.
+
+---
+
 ## Graph Properties
 > Das Element des Graphs kann mit mehreren Attributen ausgestattet werden, die verschiedene Eigenschaften beeinflussen:
 
 
 #### data-values:
-Dieses Argumennt nimmt eine Zahlenreihe entgegen, die die Werte repräsentiert, die der Graph darstellen soll.
+Dieses Argument nimmt eine Zahlenreihe entgegen, die die Werte repräsentiert, die der Graph darstellen soll.
 
 #### data-min:
 Im default entspricht dieser Wert dem kleinsten Wert in *data-values*.
