@@ -83,13 +83,13 @@ h2 {
 	overflow: hidden;
 }
 
-.measurements {
+.measurementsContainer {
 	margin: var(--outterMargin);
 	color: var(--foregroundPrimaryColor);
 	font-weight: 500;
 	font-size: 16px;
 }
-.measurements .value {
+.measurementsContainer .valueLabel {
 	color: var(--foregroundSecondaryColor);
 	font-weight: 600;
 }

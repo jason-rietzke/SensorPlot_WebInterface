@@ -29,14 +29,15 @@ function setup() {
 		setMouth();
 	}, 500);
 
-	createGraphs();
+	createMeasurements();
+	createGraphModules();
 
 	// initialize loading data from server
 	const graphContainers = document.getElementsByClassName('graphContainer');
 	for(var i = 0; i < graphContainers.length; i++) {
 		let container = graphContainers[i];
 		let graph = container.getElementsByClassName('graph')[0];
-		loadData(graph, container.getAttribute('data-interval'), container.getAttribute('data-slag'), 1);
+		//loadData(graph, container.getAttribute('data-interval'), container.getAttribute('data-slag'), 1);
 	}
 }
 
@@ -47,6 +48,7 @@ function loadData(graph, interval, slag, immediate = 0) {
 		client.open('GET', '/'+slag);
 		client.onreadystatechange = function() {
 			graph.setAttribute('data-values', client.responseText);
+			createMeasurements();
 			createGraphs();
 		}
 		client.send();
@@ -77,12 +79,46 @@ function setMouth() {
 		mouth.style.setProperty('--animationTime', '0s');
 	}, 500);
 }
-function setMouthState() {
+function animateMouth() {
 	mouth.style.setProperty('--animationTime', '0.5s');
 	setMouth();
 }
 
+function createMeasurements() {
+	const measurements = document.getElementsByClassName('measurements')[0];
+	measurements.innerHTML = '';
 
+	const graphModules = document.getElementsByClassName('graphmodule');
+	for(var i = 0; i < graphModules.length; i++) {
+		let module = graphModules[i];
+		let container = module.getElementsByClassName('graphContainer')[0];
+		let graph = container.getElementsByClassName('graph')[0];
+		let values = parseValues(graph);
+
+		let p = document.createElement('p');
+
+		let label = document.createElement('span');
+		label.classList.add('valueLabel');
+		label.textContent = container.getAttribute('data-title') + ': ';
+		p.appendChild(label);
+
+		let value = document.createElement('span');
+		value.textContent = values[values.length-1] + container.getAttribute('data-unit');
+		p.appendChild(value);
+
+		measurements.appendChild(p);
+	}
+}
+function createGraphModules() {
+	const graphModules = document.getElementsByClassName('graphmodule');
+	for(var i = 0; i < graphModules.length; i++) {
+		let module = graphModules[i];
+		let title = module.getElementsByTagName('h1')[0];
+		let container = module.getElementsByClassName('graphContainer')[0];
+		title.textContent = container.getAttribute('data-title');
+	}
+	createGraphs();
+}
 function createGraphs() {
 	const graphContainers = document.getElementsByClassName('graphContainer');
 	for(var i = 0; i < graphContainers.length; i++) {
@@ -113,7 +149,7 @@ function createGraphs() {
 			if (graph.getAttribute('data-max')) max = graph.getAttribute('data-max');
 		}
 
-		buildFrame(container, frame, height, width);
+		buildFrame(frame, height, width);
 		buildGraph(graph, values, min, max, height, width);
 		buildLabels(container, graph, min, max, height, width);
 		detailedView(i, container, graph, frame, values);
@@ -121,7 +157,7 @@ function createGraphs() {
 }
 
 
-function buildFrame(container, frame, height, width) {
+function buildFrame(frame, height, width) {
 	frame.setAttribute('points', `40,0 40,${height} ${width},${height} 40,${height}`);
 }
 function buildLabels(container, graph, min, max, height, width) {
@@ -154,9 +190,13 @@ function buildGraph(graph, values, min, max, height, width) {
 	points += `40,${height} `;
 	width = width - 40;
 	for(i=0;i<values.length;i++){
-		points += `${(width/(values.length-1))*i + 40},${height*(1-((values[i]-min)/max))} `;
+		if (i == values.length-1) {
+			points += `${(width/(values.length-1))*i + 43},${height*(1-((values[i]-min)/max))} `;
+		} else {
+			points += `${(width/(values.length-1))*i + 40},${height*(1-((values[i]-min)/max))} `;
+		}
 	}
-	points += `${width + 40},${height} `;
+	points += `${width + 43},${height} `;
 	graph.setAttribute('points', points);
 }
 
@@ -217,7 +257,7 @@ function createDetailedLabel(i, container, graph, pos, values, valueIndex) {
 	rect.setAttribute('x', pos-(rect.getBBox().width/2));
 
 	// offset correction on boundries
-	if ((rect.getBBox().x+rect.getBBox().width) > (graph.getBBox().x+graph.getBBox().width)) { rect.setAttribute('x', ((graph.getBBox().x+graph.getBBox().width)-rect.getBBox().width))}
+	if ((rect.getBBox().x+rect.getBBox().width)+3 > (graph.getBBox().x+graph.getBBox().width)) { rect.setAttribute('x', ((graph.getBBox().x+graph.getBBox().width)-rect.getBBox().width-3))}
 	if (rect.getBBox().x < 40) { rect.setAttribute('x', 40)}
 
 	if(document.getElementById('detailLabelText'+i)){document.getElementById('detailLabelText'+i).remove();}
@@ -226,14 +266,16 @@ function createDetailedLabel(i, container, graph, pos, values, valueIndex) {
 	text.setAttribute('id', 'detailLabelText'+i);
 	container.appendChild(text);
 
-	const ppt = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-	ppt.textContent = values[valueIndex];
-	ppt.setAttribute('x', rect.getBBox().x + 5);
-	ppt.setAttribute('y', rect.getBBox().y + 15);
+	const value = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+	value.textContent = values[valueIndex] + container.getAttribute('data-unit');
+	value.setAttribute('x', rect.getBBox().x + 5);
+	value.setAttribute('y', rect.getBBox().y + 15);
+
 	const time = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
 	time.textContent = 'at '+'14:45';
 	time.setAttribute('x', rect.getBBox().x + 5);
 	time.setAttribute('y', rect.getBBox().y + 32);
-	text.appendChild(ppt)
+
+	text.appendChild(value)
 	text.appendChild(time);
 }

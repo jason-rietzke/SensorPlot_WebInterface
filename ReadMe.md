@@ -3,6 +3,12 @@
 ## GraphContainer Properties
 > Das SVG Element des GraphContainers kann mit Attributen ausgestattet werden, die verschiedene Metadatan anführen
 
+#### data-title:
+Gibt den Titel des Moduls an und wird auch im Aktuelle Messwerte Bereich als Label benutzt.
+
+#### data-unit:
+Gibt die Einheit der values an. Wird auch im detaild label und im Aktuelle Messwerte Bereich eingesetzt.
+
 #### data-slag:
 Gibt die URL an, an die die request für neue data-values gesendet wird.
 
