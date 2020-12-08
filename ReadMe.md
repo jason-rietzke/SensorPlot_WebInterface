@@ -1,5 +1,13 @@
 # CO2 Ampel
 
+## Date Source
+Die Server response muss folgendes Format haben:
+
+> < millis offset to latest data > ; < data value > , < data value > , < ... >
+
+die millis zum neusten datensatz müssen mit einem Semikolon von den Werten getrennt sein. Die Werte selbst werden von ältesten zum neusten aufgelistet und mit Komma getrennt.
+
+
 ## GraphContainer Properties
 > Das SVG Element des GraphContainers kann mit Attributen ausgestattet werden, die verschiedene Metadatan anführen
 
@@ -40,4 +48,4 @@ Ist er auf false gesetzt, werden *data-min* und *data-max* ausgedeht, wenn die W
 Gibt an, in welchen Schritten die Beschriftung der Daten angegeben werden soll.
 
 #### data-dencity:
-Gibt an, in welchem Minuten-Intervall die Daten aufgenommen wurden.
+Gibt an, in welchem Sekunden-Intervall die Daten aufgenommen werden.

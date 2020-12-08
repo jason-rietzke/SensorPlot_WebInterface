@@ -37,6 +37,9 @@ function setup() {
 	for(var i = 0; i < graphContainers.length; i++) {
 		let container = graphContainers[i];
 		let graph = container.getElementsByClassName('graph')[0];
+
+		const date = new Date(); // To Remove
+		graph.setAttribute('data-reloaded', date.getTime()); // To Remove
 		//loadData(graph, container.getAttribute('data-interval'), container.getAttribute('data-slag'), 1);
 	}
 }
@@ -47,7 +50,12 @@ function loadData(graph, interval, slag, immediate = 0) {
 		var client = new XMLHttpRequest();
 		client.open('GET', '/'+slag);
 		client.onreadystatechange = function() {
-			graph.setAttribute('data-values', client.responseText);
+			const offset = client.responseText.split(';')[0];
+			graph.setAttribute('data-offset', values);
+			const values = client.responseText.split(';')[1];
+			graph.setAttribute('data-values', values);
+			const date = new Date();
+			graph.setAttribute('data-reloaded', date.getTime());
 			createMeasurements();
 			createGraphs();
 		}
@@ -253,7 +261,7 @@ function createDetailedLabel(i, container, graph, pos, values, valueIndex) {
 	rect.setAttribute('width', 120);
 	rect.setAttribute('height', 40);
 	rect.setAttribute('rx', 10);
-	rect.setAttribute('y', 0);
+	rect.setAttribute('y', 1);
 	rect.setAttribute('x', pos-(rect.getBBox().width/2));
 
 	// offset correction on boundries
@@ -266,16 +274,22 @@ function createDetailedLabel(i, container, graph, pos, values, valueIndex) {
 	text.setAttribute('id', 'detailLabelText'+i);
 	container.appendChild(text);
 
-	const value = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-	value.textContent = values[valueIndex] + container.getAttribute('data-unit');
-	value.setAttribute('x', rect.getBBox().x + 5);
-	value.setAttribute('y', rect.getBBox().y + 15);
+	const valueView = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+	valueView.textContent = values[valueIndex] + container.getAttribute('data-unit');
+	valueView.setAttribute('x', rect.getBBox().x + 5);
+	valueView.setAttribute('y', rect.getBBox().y + 15);
 
-	const time = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-	time.textContent = 'at '+'14:45';
-	time.setAttribute('x', rect.getBBox().x + 5);
-	time.setAttribute('y', rect.getBBox().y + 32);
+	const valueoffset = (values.length-valueIndex)*1000*graph.getAttribute('data-dencity');
+	const offset = graph.getAttribute('data-reloaded') - graph.getAttribute('data-offset') - valueoffset;
+	const date = new Date();
+	const timestamp = date.getTime();
+	const time = new Date(timestamp - (timestamp - offset));
+	const timeText = (time.getHours()<10?'0':'')+time.getHours()+':'+(time.getMinutes()<10?'0':'')+time.getMinutes();
+	const timeView = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+	timeView.textContent = 'at '+timeText;
+	timeView.setAttribute('x', rect.getBBox().x + 5);
+	timeView.setAttribute('y', rect.getBBox().y + 32);
 
-	text.appendChild(value)
-	text.appendChild(time);
+	text.appendChild(valueView)
+	text.appendChild(timeView);
 }
