@@ -29,7 +29,6 @@ function setup() {
 		setMouth();
 	}, 500);
 
-	createMeasurements();
 	createGraphModules();
 
 	// initialize loading data from server
@@ -40,9 +39,11 @@ function setup() {
 
 		const date = new Date(); // To Remove
 		graph.setAttribute('data-reloaded', date.getTime()); // To Remove
-		//loadData(graph, container.getAttribute('data-interval'), container.getAttribute('data-slag'), 1);
+		loadData(graph, container.getAttribute('data-interval'), container.getAttribute('data-slag'), 1);
 	}
 	createGraphs();
+	createMeasurements();
+	validateMouthState()
 }
 
 // loading data from server
@@ -357,7 +358,7 @@ function createDetailedLabel(i, container, graph, pos, values, valueIndex) {
 	const time = new Date(timestamp - (timestamp - offset));
 	const timeText = (time.getHours()<10?'0':'')+time.getHours()+':'+(time.getMinutes()<10?'0':'')+time.getMinutes();
 	const timeView = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-	timeView.textContent = 'at '+timeText;
+	timeView.textContent = '🕔 '+timeText;
 	timeView.setAttribute('x', rect.getBBox().x + 5);
 	timeView.setAttribute('y', rect.getBBox().y + 32);
 
