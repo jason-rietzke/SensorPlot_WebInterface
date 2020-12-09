@@ -11,9 +11,9 @@ const SmileyState = {
 	Sad: 'Sad'
 };
 
-let state = SmileyState.Happy;
 let smiley;
 let mouth;
+let smileyState = SmileyState.Happy;
 
 
 function createReferences() {
@@ -59,20 +59,53 @@ function loadData(graph, interval, slag, immediate = 0) {
 			graph.setAttribute('data-reloaded', date.getTime());
 			createMeasurements();
 			createGraphs();
+			validateMouthState();
 		}
 		client.send();
 		loadData(graph, interval, slag)
 	}, immediate ? 0 : (interval * 1000));
 }
 
-
+function validateMouthState() {
+	const graphContainers = document.getElementsByClassName('graphContainer');
+	let state = SmileyState.Happy;
+	for(var i = 0; i < graphContainers.length; i++) {
+		const container = graphContainers[i];
+		const graph = container.getElementsByClassName('graph')[0];
+		let values = parseValues(graph);
+		let currentValue = values[values.length-1];
+		let goodThreshold = container.getAttribute('data-good-threshold');
+		let badThreshold = container.getAttribute('data-bad-threshold');
+		switch (state) {
+			case SmileyState.Happy:
+				if (currentValue > badThreshold && badThreshold != '') {
+					console.log(currentValue);
+					state = SmileyState.Sad;
+				} else if (currentValue > goodThreshold && goodThreshold != '') {
+					console.log(currentValue);
+					state = SmileyState.Medium;
+				}
+				break;
+			case SmileyState.Medium:
+				if (currentValue > badThreshold && badThreshold != '') {
+					console.log(currentValue);
+					state = SmileyState.Sad;
+				}
+				break;
+			default:
+				break;
+		}
+	}
+	smileyState = state;
+	animateMouth();
+}
 function setMouth() {
 	const c = parseInt(smiley.clientWidth / 2);
 	let path = `M${c*0.6},${c*1.3} Q${c},${c*1.3} ${c*1.4},${c*1.3}`;
 	// M${c*0.6},${c*1.3} Q${c},${c*1.8} ${c*1.4},${c*1.3}	| Happy
 	// M${c*0.6},${c*1.4} Q${c},${c*1.3} ${c*1.4},${c*1.2}	| Medium
 	// M${c*0.6},${c*1.4} Q${c},${c} ${c*1.4},${c*1.4}		| Sad
-	switch (state) {
+	switch (smileyState) {
 		case SmileyState.Happy:
 			path = `M${c*0.6},${c*1.3} Q${c},${c*1.8} ${c*1.4},${c*1.3}`; 
 			break;

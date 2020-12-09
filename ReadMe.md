@@ -23,6 +23,14 @@ Gibt die URL an, an die die request für neue data-values gesendet wird.
 #### data-interval:
 Gibt in Sekunden an, in welchem Interval auf die gegebene URL eine request gesendet werden soll, um die Daten regelmäßig nach zu laden.
 
+#### data-good-threshold:
+Gibt an bis zu welchem Wert der Smiley glücklich ist.
+
+#### data-bad-threshold:
+Gibt an ab welchem Wert der Smiley traurig ist.
+
+>liegt der Wert zwischen good und bad ist der Smiley neutral
+
 ---
 
 ## Graph Properties
