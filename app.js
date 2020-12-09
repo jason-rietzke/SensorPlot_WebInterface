@@ -42,6 +42,7 @@ function setup() {
 		graph.setAttribute('data-reloaded', date.getTime()); // To Remove
 		//loadData(graph, container.getAttribute('data-interval'), container.getAttribute('data-slag'), 1);
 	}
+	createGraphs();
 }
 
 // loading data from server
@@ -159,33 +160,35 @@ function createGraphs() {
 
 		buildFrame(frame, height, width);
 		buildGraph(graph, values, min, max, height, width);
-		buildLabels(container, graph, min, max, height, width);
+		buildYLabels(container, graph, min, max, height, width);
+		buildXLabels(container, graph, values, height, width);
 		detailedView(i, container, graph, frame, values);
 	}
 }
 
 
 function buildFrame(frame, height, width) {
-	frame.setAttribute('points', `40,0 40,${height} ${width},${height} 40,${height}`);
+	frame.setAttribute('points', `40,0 40,${height-20} ${width},${height-20} 40,${height-20}`);
 }
-function buildLabels(container, graph, min, max, height, width) {
-	let labels = container.getElementsByClassName('label');
-	for(i=labels.length-1;i>=0;i--) {
-		labels[i].remove();
-	}
+function buildYLabels(container, graph, min, max, height, width) {
+	height = height - 20;
 	const stepSize = parseInt(graph.getAttribute('data-stepsize'));
 	min = parseFloat(min);
 	max = parseFloat(max);
+	let labels = container.getElementsByClassName('labelY');
+	for(i=labels.length-1;i>=0;i--) {
+		labels[i].remove();
+	}
 	for(j=min;j<=max;j+=stepSize) {
 		const yPos = height-((j/max)*height);
 		const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
 		label.textContent = j;
 		container.appendChild(label);
-		label.classList.add('label');
+		label.classList.add('labelY');
 		label.setAttribute('x',35-label.getBBox().width);
 		label.setAttribute('y',yPos);
 	}
-	labels = document.getElementsByClassName('label')
+	labels = container.getElementsByClassName('labelY');
 	const labelTop = labels[labels.length - 1];
 	if (labelTop.getBBox().y < labelTop.getBBox().height) {
 		labelTop.setAttribute('y',labelTop.getBBox().height);
@@ -193,10 +196,45 @@ function buildLabels(container, graph, min, max, height, width) {
 	const labelBottom = labels[0];
 	labelBottom.setAttribute('y',height-(labelTop.getBBox().height/2));
 }
+function buildXLabels(container, graph, values, height, width) {
+	height = height - 20;
+	width = width - 40;
+	let stepSize = parseInt(graph.getAttribute('data-dencity-stepsize'));
+	if (window.innerWidth < 750) {stepSize = stepSize*2}
+	const dencity = parseInt(graph.getAttribute('data-dencity'));
+	let labels = container.getElementsByClassName('labelX');
+	for(i=labels.length-1;i>=0;i--) {
+		labels[i].remove();
+	}
+	for(j=0;j<=values.length;j+=(stepSize/dencity)) {
+		const valueoffset = (values.length-(values.length-j))*1000*dencity;
+		const offset = graph.getAttribute('data-reloaded') - graph.getAttribute('data-offset') - valueoffset;
+		const date = new Date();
+		const timestamp = date.getTime();
+		const time = new Date(timestamp - (timestamp - offset));
+		const timeText = (time.getHours()<10?'0':'')+time.getHours()+':'+(time.getMinutes()<10?'0':'')+time.getMinutes();
+		
+		const xPos = (width-((j/values.length)*width)+35);
+		const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+		label.textContent = timeText;
+		container.appendChild(label);
+		label.classList.add('labelX');
+		label.setAttribute('x',xPos);
+		label.setAttribute('y',height+20);
+	}
+	labels = container.getElementsByClassName('labelX');
+	const labelRight = labels[0];
+	if ((labelRight.getBBox().x+labelRight.getBBox().width) > container.getBBox().width) {
+		labelRight.setAttribute('x',container.getBBox().width-(labelRight.getBBox().width*2));
+	}
+	//const labelBottom = labels[0];
+	//labelBottom.setAttribute('y',height-(labelTop.getBBox().height/2));
+}
 function buildGraph(graph, values, min, max, height, width) {
 	let points = '';
-	points += `40,${height} `;
 	width = width - 40;
+	height = height - 20;
+	points += `40,${height} `;
 	for(i=0;i<values.length;i++){
 		if (i == values.length-1) {
 			points += `${(width/(values.length-1))*i + 43},${height*(1-((values[i]-min)/max))} `;
@@ -245,7 +283,7 @@ function createDetailedPointer(i, container, pos) {
 	container.appendChild(poly);
 	const p1 = container.createSVGPoint();
 	p1.x = pos;
-	p1.y = height;
+	p1.y = height - 20;
 	const p2 = container.createSVGPoint();
 	p2.x = pos;
 	p2.y = 0;

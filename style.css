@@ -144,6 +144,14 @@ h2 {
 	fill: var(--foregroundPrimaryColor);
 	font-size: 14px;
 }
+.labelY {
+	fill: var(--foregroundPrimaryColor);
+	font-size: 14px;
+}
+.labelX {
+	fill: var(--foregroundPrimaryColor);
+	font-size: 14px;
+}
 .detailPointer {
 	stroke: var(--foregroundPrimaryColor);
 	stroke-width: 3px;

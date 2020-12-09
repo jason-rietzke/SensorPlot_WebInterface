@@ -45,7 +45,10 @@ Im default entspricht dieser Wert true und die Werte werden abgeschnitten, falls
 Ist er auf false gesetzt, werden *data-min* und *data-max* ausgedeht, wenn die Werte den angegebenen Bereich verlassen.
 
 #### data-stepsize:
-Gibt an, in welchen Schritten die Beschriftung der Daten angegeben werden soll.
+Gibt an, in welchen Schritten die Beschriftung der Daten [Y-Axis] angegeben werden soll.
 
 #### data-dencity:
 Gibt an, in welchem Sekunden-Intervall die Daten aufgenommen werden.
+
+#### data-dencityStepsize:
+Gibt an, in welchen Schritten die Beschriftung der dencity [X-Axis] angegeben werden soll.
