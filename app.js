@@ -349,7 +349,7 @@ function createDetailedPointer(i, container, pos) {
 	var height = container.clientHeight;
 	var width = container.clientWidth;
 	if(document.getElementById('detailPointer'+i)){document.getElementById('detailPointer'+i).remove();}
-	const poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+	const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
 	poly.classList.add('detailPointer');
 	poly.setAttribute('id', 'detailPointer'+i);
 	container.appendChild(poly);
@@ -364,7 +364,7 @@ function createDetailedPointer(i, container, pos) {
 }
 function createDetailedLabel(i, container, graph, pos, values, valueIndex) {
 	if(document.getElementById('detailLabelRect'+i)){document.getElementById('detailLabelRect'+i).remove();}
-	const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+	const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
 	rect.classList.add('detailLabel');
 	rect.setAttribute('id', 'detailLabelRect'+i);
 	container.appendChild(rect);
@@ -400,6 +400,6 @@ function createDetailedLabel(i, container, graph, pos, values, valueIndex) {
 	timeView.setAttribute('x', rect.getBBox().x + 5);
 	timeView.setAttribute('y', rect.getBBox().y + 32);
 
-	text.appendChild(valueView)
+	text.appendChild(valueView);
 	text.appendChild(timeView);
 }
