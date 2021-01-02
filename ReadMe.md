@@ -1,11 +1,20 @@
 # CO2 Ampel
 
 ## Date Source
+Die Server muss auf den Endpoint */graphData* wie folgt responsen:
+
+> < title, unit, slag, interval, good, bad, min, max, clipping, stepsize, cycle, cycleStepsize > ; < ... >
+
+Jeder neue Graph ist mit einem Semikolon von dem nächsten getrennt
+
+---
+
 Die Server response muss folgendes Format haben:
 
 > < millis offset to latest data > ; < data value > , < data value > , < ... >
 
 die millis zum neusten datensatz müssen mit einem Semikolon von den Werten getrennt sein. Die Werte selbst werden von ältesten zum neusten aufgelistet und mit Komma getrennt.
+
 
 
 ## GraphContainer Properties
@@ -38,7 +47,7 @@ Gibt an ab welchem Wert der Smiley traurig ist.
 
 
 #### data-values:
-Dieses Argument nimmt eine Zahlenreihe entgegen, die die Werte repräsentiert, die der Graph darstellen soll.
+*>automatisch ausgefüllt<* Dieses Argument nimmt eine Zahlenreihe entgegen, die die Werte repräsentiert, die der Graph darstellen soll.
 
 #### data-min:
 Im default entspricht dieser Wert dem kleinsten Wert in *data-values*.
@@ -55,8 +64,8 @@ Ist er auf false gesetzt, werden *data-min* und *data-max* ausgedeht, wenn die W
 #### data-stepsize:
 Gibt an, in welchen Schritten die Beschriftung der Daten [Y-Axis] angegeben werden soll.
 
-#### data-dencity:
+#### data-cycle:
 Gibt an, in welchem Sekunden-Intervall die Daten aufgenommen werden.
 
-#### data-dencityStepsize:
-Gibt an, in welchen Schritten die Beschriftung der dencity [X-Axis] angegeben werden soll.
+#### data-cycleStepsize:
+Gibt an, in welchen Schritten die Beschriftung der cycle [X-Axis] angegeben werden soll.

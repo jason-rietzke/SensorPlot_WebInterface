@@ -29,21 +29,32 @@ function setup() {
 		setMouth();
 	}, 500);
 
-	createGraphModules();
+	loadGraphs();
+}
 
-	// initialize loading data from server
-	const graphContainers = document.getElementsByClassName('graphContainer');
-	for(var i = 0; i < graphContainers.length; i++) {
-		let container = graphContainers[i];
-		let graph = container.getElementsByClassName('graph')[0];
-
-		const date = new Date(); // To Remove
-		graph.setAttribute('data-reloaded', date.getTime()); // To Remove
-		loadData(graph, container.getAttribute('data-interval'), container.getAttribute('data-slag'), 1);
+// loading graphdata from server
+function loadGraphs() {
+	var client = new XMLHttpRequest();
+	client.open('GET', '/graphData');
+	client.onreadystatechange = function() {
+		const graphs = client.responseText.split(';');
+		for(i=0;i<graphs.length;i++){
+			const graph = graphs[i];
+			const data = graph.splot(',');
+			createGraphModule(data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11])
+		}
+		// initialize loading data from server
+		const graphContainers = document.getElementsByClassName('graphContainer');
+		for(var i = 0; i < graphContainers.length; i++) {
+			let container = graphContainers[i];
+			let graph = container.getElementsByClassName('graph')[0];
+			loadData(graph, container.getAttribute('data-interval'), container.getAttribute('data-slag'), 1);
+		}
+		createGraphs();
+		createMeasurements();
+		validateMouthState()
 	}
-	createGraphs();
-	createMeasurements();
-	validateMouthState()
+	client.send();
 }
 
 // loading data from server
@@ -53,7 +64,7 @@ function loadData(graph, interval, slag, immediate = 0) {
 		client.open('GET', '/'+slag);
 		client.onreadystatechange = function() {
 			const offset = client.responseText.split(';')[0];
-			graph.setAttribute('data-offset', values);
+			graph.setAttribute('data-offset', offset);
 			const values = client.responseText.split(';')[1];
 			graph.setAttribute('data-values', values);
 			const date = new Date();
@@ -66,6 +77,7 @@ function loadData(graph, interval, slag, immediate = 0) {
 		loadData(graph, interval, slag)
 	}, immediate ? 0 : (interval * 1000));
 }
+
 
 function validateMouthState() {
 	const graphContainers = document.getElementsByClassName('graphContainer');
@@ -152,16 +164,42 @@ function createMeasurements() {
 		measurements.appendChild(p);
 	}
 }
-function createGraphModules() {
-	const graphModules = document.getElementsByClassName('graphmodule');
-	for(var i = 0; i < graphModules.length; i++) {
-		let module = graphModules[i];
-		let title = module.getElementsByTagName('h1')[0];
-		let container = module.getElementsByClassName('graphContainer')[0];
-		title.textContent = container.getAttribute('data-title');
-	}
-	createGraphs();
+
+function createGraphModule(title, unit, slag, interval, good, bad, min, max, clipping, stepsize, cycle, cycleStepsize) {
+	const graphModule = document.createElement('div');
+	graphModule.classList.add('container', 'graphmodule');
+
+	const headline = document.createElement('h1');
+	headline.textContent = title;
+	graphModule.appendChild(headline);
+	
+	const graphContainer = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+	graphContainer.classList.add('graphContainer');
+	graphContainer.setAttribute('data-unit', unit);
+	graphContainer.setAttribute('data-slag', slag);
+	graphContainer.setAttribute('data-interval', interval);
+	graphContainer.setAttribute('data-good-threshold', good);
+	graphContainer.setAttribute('data-bad-threshold', bad);
+	graphModule.appendChild(graphContainer);
+
+	const graphPolygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+	graphPolygon.classList.add('graph');
+	graphPolygon.setAttribute('data-min', min);
+	graphPolygon.setAttribute('data-max', max);
+	graphPolygon.setAttribute('data-clipping', clipping);
+	graphPolygon.setAttribute('data-stepsize', stepsize);
+	graphPolygon.setAttribute('data-cycle', cycle);
+	graphPolygon.setAttribute('data-cycle-stepsize', cycleStepsize);
+	graphPolygon.setAttribute('data-values', '');
+	graphContainer.appendChild(graphPolygon);
+
+	const framePolygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+	framePolygon.classList.add('frame');
+	graphContainer.appendChild(framePolygon);
+
+	document.getElementsByClassName('graphsContainer').appendChild(graphModule);
 }
+
 function createGraphs() {
 	const graphContainers = document.getElementsByClassName('graphContainer');
 	for(var i = 0; i < graphContainers.length; i++) {
@@ -233,15 +271,15 @@ function buildYLabels(container, graph, min, max, height, width) {
 function buildXLabels(container, graph, values, height, width) {
 	height = height - 20;
 	width = width - 40;
-	let stepSize = parseInt(graph.getAttribute('data-dencity-stepsize'));
+	let stepSize = parseInt(graph.getAttribute('data-cycle-stepsize'));
 	if (window.innerWidth < 750) {stepSize = stepSize*2}
-	const dencity = parseInt(graph.getAttribute('data-dencity'));
+	const cycle = parseInt(graph.getAttribute('data-cycle'));
 	let labels = container.getElementsByClassName('labelX');
 	for(i=labels.length-1;i>=0;i--) {
 		labels[i].remove();
 	}
-	for(j=0;j<=values.length;j+=(stepSize/dencity)) {
-		const valueoffset = (values.length-(values.length-j))*1000*dencity;
+	for(j=0;j<=values.length;j+=(stepSize/cycle)) {
+		const valueoffset = (values.length-(values.length-j))*1000*cycle;
 		const offset = graph.getAttribute('data-reloaded') - graph.getAttribute('data-offset') - valueoffset;
 		const date = new Date();
 		const timestamp = date.getTime();
@@ -351,7 +389,7 @@ function createDetailedLabel(i, container, graph, pos, values, valueIndex) {
 	valueView.setAttribute('x', rect.getBBox().x + 5);
 	valueView.setAttribute('y', rect.getBBox().y + 15);
 
-	const valueoffset = (values.length-valueIndex)*1000*graph.getAttribute('data-dencity');
+	const valueoffset = (values.length-valueIndex)*1000*graph.getAttribute('data-cycle');
 	const offset = graph.getAttribute('data-reloaded') - graph.getAttribute('data-offset') - valueoffset;
 	const date = new Date();
 	const timestamp = date.getTime();
