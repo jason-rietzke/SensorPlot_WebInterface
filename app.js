@@ -1,26 +1,21 @@
 window.onload = createReferences;
-window.onpageshow = setup;
 window.onresize = ()=>{
 	setMouth();
 	createGraphs();
 }
-
 const SmileyState = {
 	Happy: 'Happy',
 	Medium: 'Medium',
 	Sad: 'Sad'
 };
-
 let smiley;
 let mouth;
 let smileyState = SmileyState.Happy;
-
-
 function createReferences() {
 	smiley = document.getElementById('smiley');
 	mouth = document.getElementById('mouth');
+	setup();
 }
-
 function setup() {
 	const c = parseInt(smiley.clientWidth / 2);
 	let path = `M${c*0.6},${c*1.3} Q${c},${c*1.3} ${c*1.4},${c*1.3}`;
@@ -28,57 +23,47 @@ function setup() {
 	setTimeout(() => {
 		setMouth();
 	}, 500);
-
 	loadGraphs();
 }
-
 // loading graphdata from server
 function loadGraphs() {
-	var client = new XMLHttpRequest();
-	client.open('GET', '/graphData');
-	client.onreadystatechange = function() {
-		const graphs = client.responseText.split(';');
+	let webClient = new XMLHttpRequest();
+	webClient.open('GET', '/graphData');
+	webClient.addEventListener('load', function(event) {
+		const graphs = webClient.responseText.split(';');
 		for(i=0;i<graphs.length;i++){
 			const graph = graphs[i];
-			const data = graph.splot(',');
-			createGraphModule(data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11])
-		}
-		// initialize loading data from server
-		const graphContainers = document.getElementsByClassName('graphContainer');
-		for(var i = 0; i < graphContainers.length; i++) {
-			let container = graphContainers[i];
-			let graph = container.getElementsByClassName('graph')[0];
-			loadData(graph, container.getAttribute('data-interval'), container.getAttribute('data-slag'), 1);
+			const data = graph.split(',');
+			if(!(data.length < 12)){
+				createGraphModule(data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11])
+			}
 		}
 		createGraphs();
 		createMeasurements();
-		validateMouthState()
-	}
-	client.send();
+		validateMouthState();
+	});
+	webClient.send();
 }
-
 // loading data from server
 function loadData(graph, interval, slag, immediate = 0) {
 	setTimeout(() => {
-		var client = new XMLHttpRequest();
-		client.open('GET', '/'+slag);
-		client.onreadystatechange = function() {
-			const offset = client.responseText.split(';')[0];
+		let webClient = new XMLHttpRequest();
+		webClient.open('GET', `/data/${slag}`);
+		webClient.addEventListener('load', function(event) {
+			const offset = webClient.responseText.split(';')[0];
 			graph.setAttribute('data-offset', offset);
-			const values = client.responseText.split(';')[1];
+			const values = webClient.responseText.split(';')[1];
 			graph.setAttribute('data-values', values);
 			const date = new Date();
 			graph.setAttribute('data-reloaded', date.getTime());
 			createMeasurements();
 			createGraphs();
 			validateMouthState();
-		}
-		client.send();
+		});
+		webClient.send();
 		loadData(graph, interval, slag)
 	}, immediate ? 0 : (interval * 1000));
 }
-
-
 function validateMouthState() {
 	const graphContainers = document.getElementsByClassName('graphContainer');
 	let state = SmileyState.Happy;
@@ -115,9 +100,6 @@ function validateMouthState() {
 function setMouth() {
 	const c = parseInt(smiley.clientWidth / 2);
 	let path = `M${c*0.6},${c*1.3} Q${c},${c*1.3} ${c*1.4},${c*1.3}`;
-	// M${c*0.6},${c*1.3} Q${c},${c*1.8} ${c*1.4},${c*1.3}	| Happy
-	// M${c*0.6},${c*1.4} Q${c},${c*1.3} ${c*1.4},${c*1.2}	| Medium
-	// M${c*0.6},${c*1.4} Q${c},${c} ${c*1.4},${c*1.4}		| Sad
 	switch (smileyState) {
 		case SmileyState.Happy:
 			path = `M${c*0.6},${c*1.3} Q${c},${c*1.8} ${c*1.4},${c*1.3}`; 
@@ -138,50 +120,42 @@ function animateMouth() {
 	mouth.style.setProperty('--animationTime', '0.5s');
 	setMouth();
 }
-
 function createMeasurements() {
 	const measurements = document.getElementsByClassName('measurements')[0];
 	measurements.innerHTML = '';
-
 	const graphModules = document.getElementsByClassName('graphmodule');
 	for(var i = 0; i < graphModules.length; i++) {
 		let module = graphModules[i];
 		let container = module.getElementsByClassName('graphContainer')[0];
 		let graph = container.getElementsByClassName('graph')[0];
 		let values = parseValues(graph);
-
 		let p = document.createElement('p');
-
 		let label = document.createElement('span');
 		label.classList.add('valueLabel');
 		label.textContent = container.getAttribute('data-title') + ': ';
 		p.appendChild(label);
-
 		let value = document.createElement('span');
 		value.textContent = values[values.length-1] + container.getAttribute('data-unit');
 		p.appendChild(value);
-
 		measurements.appendChild(p);
 	}
 }
-
 function createGraphModule(title, unit, slag, interval, good, bad, min, max, clipping, stepsize, cycle, cycleStepsize) {
 	const graphModule = document.createElement('div');
 	graphModule.classList.add('container', 'graphmodule');
-
 	const headline = document.createElement('h1');
 	headline.textContent = title;
 	graphModule.appendChild(headline);
 	
 	const graphContainer = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
 	graphContainer.classList.add('graphContainer');
+	graphContainer.setAttribute('data-title', title);
 	graphContainer.setAttribute('data-unit', unit);
 	graphContainer.setAttribute('data-slag', slag);
 	graphContainer.setAttribute('data-interval', interval);
 	graphContainer.setAttribute('data-good-threshold', good);
 	graphContainer.setAttribute('data-bad-threshold', bad);
 	graphModule.appendChild(graphContainer);
-
 	const graphPolygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
 	graphPolygon.classList.add('graph');
 	graphPolygon.setAttribute('data-min', min);
@@ -190,26 +164,22 @@ function createGraphModule(title, unit, slag, interval, good, bad, min, max, cli
 	graphPolygon.setAttribute('data-stepsize', stepsize);
 	graphPolygon.setAttribute('data-cycle', cycle);
 	graphPolygon.setAttribute('data-cycle-stepsize', cycleStepsize);
-	graphPolygon.setAttribute('data-values', '');
+	graphPolygon.setAttribute('data-values', '0');
 	graphContainer.appendChild(graphPolygon);
-
 	const framePolygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
 	framePolygon.classList.add('frame');
 	graphContainer.appendChild(framePolygon);
-
-	document.getElementsByClassName('graphsContainer').appendChild(graphModule);
+	document.getElementById('graphsContainer').appendChild(graphModule);
+	loadData(graphPolygon, interval, slag, 1);
 }
-
 function createGraphs() {
 	const graphContainers = document.getElementsByClassName('graphContainer');
 	for(var i = 0; i < graphContainers.length; i++) {
 		let container = graphContainers[i];
 		let graph = container.getElementsByClassName('graph')[0];
 		let frame = container.getElementsByClassName('frame')[0];
-
 		let height = container.clientHeight;
 		let width = container.clientWidth;
-
 		// Min, Max Values
 		let values = parseValues(graph);
 		let min = values[0];
@@ -229,7 +199,6 @@ function createGraphs() {
 			if (graph.getAttribute('data-min')) min = graph.getAttribute('data-min');
 			if (graph.getAttribute('data-max')) max = graph.getAttribute('data-max');
 		}
-
 		buildFrame(frame, height, width);
 		buildGraph(graph, values, min, max, height, width);
 		buildYLabels(container, graph, min, max, height, width);
@@ -237,8 +206,6 @@ function createGraphs() {
 		detailedView(i, container, graph, frame, values);
 	}
 }
-
-
 function buildFrame(frame, height, width) {
 	frame.setAttribute('points', `40,0 40,${height-20} ${width},${height-20} 40,${height-20}`);
 }
@@ -262,11 +229,15 @@ function buildYLabels(container, graph, min, max, height, width) {
 	}
 	labels = container.getElementsByClassName('labelY');
 	const labelTop = labels[labels.length - 1];
-	if (labelTop.getBBox().y < labelTop.getBBox().height) {
-		labelTop.setAttribute('y',labelTop.getBBox().height);
+	if (labelTop) {
+		if (labelTop.getBBox().y < labelTop.getBBox().height) {
+			labelTop.setAttribute('y',labelTop.getBBox().height);
+		}
 	}
 	const labelBottom = labels[0];
-	labelBottom.setAttribute('y',height-(labelTop.getBBox().height/2));
+	if (labelBottom) {
+		labelBottom.setAttribute('y',height-(labelTop.getBBox().height/2));
+	}
 }
 function buildXLabels(container, graph, values, height, width) {
 	height = height - 20;
@@ -296,11 +267,11 @@ function buildXLabels(container, graph, values, height, width) {
 	}
 	labels = container.getElementsByClassName('labelX');
 	const labelRight = labels[0];
-	if ((labelRight.getBBox().x+labelRight.getBBox().width) > container.getBBox().width) {
-		labelRight.setAttribute('x',container.getBBox().width-(labelRight.getBBox().width*2));
+	if (labelRight) {
+		if ((labelRight.getBBox().x+labelRight.getBBox().width) > container.getBBox().width) {
+			labelRight.setAttribute('x',container.getBBox().width-(labelRight.getBBox().width*2));
+		}
 	}
-	//const labelBottom = labels[0];
-	//labelBottom.setAttribute('y',height-(labelTop.getBBox().height/2));
 }
 function buildGraph(graph, values, min, max, height, width) {
 	let points = '';
@@ -317,7 +288,6 @@ function buildGraph(graph, values, min, max, height, width) {
 	points += `${width + 43},${height} `;
 	graph.setAttribute('points', points);
 }
-
 function parseValues(graph) {
 	const vals = graph.getAttribute('data-values').split(',');
 	for(i=0;i<vals.length;i++){
@@ -325,7 +295,6 @@ function parseValues(graph) {
 	}
 	return vals;
 }
-
 function detailedView(i, container, graph, frame, values) {
 	document.removeEventListener('mousemove', function(e){});
 	document.addEventListener('mousemove', function(e){
@@ -373,22 +342,18 @@ function createDetailedLabel(i, container, graph, pos, values, valueIndex) {
 	rect.setAttribute('rx', 10);
 	rect.setAttribute('y', 1);
 	rect.setAttribute('x', pos-(rect.getBBox().width/2));
-
 	// offset correction on boundries
 	if ((rect.getBBox().x+rect.getBBox().width)+3 > (graph.getBBox().x+graph.getBBox().width)) { rect.setAttribute('x', ((graph.getBBox().x+graph.getBBox().width)-rect.getBBox().width-3))}
 	if (rect.getBBox().x < 40) { rect.setAttribute('x', 40)}
-
 	if(document.getElementById('detailLabelText'+i)){document.getElementById('detailLabelText'+i).remove();}
 	const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
 	text.classList.add('label');
 	text.setAttribute('id', 'detailLabelText'+i);
 	container.appendChild(text);
-
 	const valueView = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
 	valueView.textContent = values[valueIndex] + container.getAttribute('data-unit');
 	valueView.setAttribute('x', rect.getBBox().x + 5);
 	valueView.setAttribute('y', rect.getBBox().y + 15);
-
 	const valueoffset = (values.length-valueIndex)*1000*graph.getAttribute('data-cycle');
 	const offset = graph.getAttribute('data-reloaded') - graph.getAttribute('data-offset') - valueoffset;
 	const date = new Date();
@@ -399,7 +364,6 @@ function createDetailedLabel(i, container, graph, pos, values, valueIndex) {
 	timeView.textContent = '🕔 '+timeText;
 	timeView.setAttribute('x', rect.getBBox().x + 5);
 	timeView.setAttribute('y', rect.getBBox().y + 32);
-
 	text.appendChild(valueView);
 	text.appendChild(timeView);
 }

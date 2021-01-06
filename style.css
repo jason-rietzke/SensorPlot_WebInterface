@@ -1,8 +1,6 @@
 * {
 	font-family: -apple-system, BlinkMacSystemFont, sans-serif;
 }
-
-/*Lightmode*/
 @media(prefers-color-scheme: light) {
 	* {
 		--backgroundPrimaryColor: #f0f0fa;
@@ -11,7 +9,6 @@
 		--foregroundSecondaryColor: #30303a;
 	}
 }
-/*Darkmode*/
 @media(prefers-color-scheme: dark) {
 	* {
 		--backgroundPrimaryColor: #0a0a1a;
@@ -20,37 +17,28 @@
 		--foregroundSecondaryColor: #a0a0aa;
 	}
 }
-
-/*Desktop Aspects*/
 @media (min-width: 750px) {
 	* {
 		--outterViewWidth: calc(100vw - 120px);
 		--outterMargin: 40px;
 		--outterPadding: 20px;
-
 		--smileySize: 250px;
 		--smileyFloat: left;
 		--smileyMarginLeft: 0;
-
 		--graphHeight: 500px;
 	}
 }
-/*Mobile Aspects*/
 @media (max-width: 750px) {
 	* {
 		--outterViewWidth: calc(100vw - 60px);
 		--outterMargin: 20px;
 		--outterPadding: 10px;
-
 		--smileySize: 350px;
 		--smileyFloat: none;
 		--smileyMarginLeft: calc((var(--outterViewWidth)/2) - (var(--smileySize)/2));
-
 		--graphHeight: 600px;
 	}
 }
-
-
 body {
 	background-color: var(--backgroundPrimaryColor);
 	color: var(--foregroundPrimaryColor);
@@ -70,8 +58,6 @@ h2 {
 	font-weight: 600;
 	font-size: 24px;
 }
-
-
 .container {
 	width: var(--outterViewWidth);
 	margin: var(--outterMargin);
@@ -82,7 +68,6 @@ h2 {
 	clear: both;
 	overflow: hidden;
 }
-
 .measurementsContainer {
 	margin: var(--outterMargin);
 	color: var(--foregroundPrimaryColor);
@@ -93,9 +78,6 @@ h2 {
 	color: var(--foregroundSecondaryColor);
 	font-weight: 600;
 }
-
-
-/*Smiley*/
 .smiley {
 	height: var(--smileySize);
 	width: var(--smileySize);
@@ -120,9 +102,6 @@ h2 {
 	transition: all var(--animationTime) ease-in-out;
 	-webkit-transition: all var(--animationTime) ease-in-out;
 }
-
-
-/*Graph*/
 .graphContainer {
 	width: calc(100% - (var(--outterMargin)*2));
 	height: var(--graphHeight);
