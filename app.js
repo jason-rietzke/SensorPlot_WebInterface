@@ -20,10 +20,27 @@ function setup() {
 	const c = parseInt(smiley.clientWidth / 2);
 	let path = `M${c*0.6},${c*1.3} Q${c},${c*1.3} ${c*1.4},${c*1.3}`;
 	mouth.setAttribute('d', path);
+	document.getElementById('callbackButton').addEventListener('click', performCallback);
 	setTimeout(() => {
 		setMouth();
 	}, 500);
 	loadGraphs();
+}
+// loading callback result from server
+function performCallback() {
+	let webClient = new XMLHttpRequest();
+	webClient.open('POST', '/callback?password=' + document.getElementById('callbackPassword').value);
+	webClient.addEventListener('load', function(event) {
+		let color = 'var(--foregroundSecondaryColor)';
+		if (webClient.responseText == '0') {
+			color = 'red';
+		} else if (webClient.responseText == '1') {
+			color = 'green';
+		}
+		document.getElementById('callbackPassword').style.borderColor = color;
+		document.getElementById('callbackButton').style.borderColor = color;
+	});
+	webClient.send();
 }
 // loading graphdata from server
 function loadGraphs() {
@@ -40,7 +57,7 @@ function loadGraphs() {
 		}
 		createGraphs();
 		createMeasurements();
-		validateMouthState();
+		validateSmileyState();
 	});
 	webClient.send();
 }
@@ -58,15 +75,16 @@ function loadData(graph, interval, slag, immediate = 0) {
 			graph.setAttribute('data-reloaded', date.getTime());
 			createMeasurements();
 			createGraphs();
-			validateMouthState();
+			validateSmileyState();
 		});
 		webClient.send();
 		loadData(graph, interval, slag)
 	}, immediate ? 0 : (interval * 1000));
 }
-function validateMouthState() {
+function validateSmileyState() {
 	const graphContainers = document.getElementsByClassName('graphContainer');
 	let state = SmileyState.Happy;
+	let smileyColor = '#33de18';
 	for(var i = 0; i < graphContainers.length; i++) {
 		const container = graphContainers[i];
 		const graph = container.getElementsByClassName('graph')[0];
@@ -79,15 +97,18 @@ function validateMouthState() {
 				if (currentValue > badThreshold && badThreshold != '') {
 					console.log(currentValue);
 					state = SmileyState.Sad;
+					smileyColor = '#f03030';
 				} else if (currentValue > goodThreshold && goodThreshold != '') {
 					console.log(currentValue);
 					state = SmileyState.Medium;
+					smileyColor = '#ffe600';
 				}
 				break;
 			case SmileyState.Medium:
 				if (currentValue > badThreshold && badThreshold != '') {
 					console.log(currentValue);
 					state = SmileyState.Sad;
+					smileyColor = '#f03030';
 				}
 				break;
 			default:
@@ -95,6 +116,7 @@ function validateMouthState() {
 		}
 	}
 	smileyState = state;
+	document.getElementsByClassName('face')[0].style.setProperty('--smileyColor', smileyColor);
 	animateMouth();
 }
 function setMouth() {
@@ -135,7 +157,7 @@ function createMeasurements() {
 		label.textContent = container.getAttribute('data-title') + ': ';
 		p.appendChild(label);
 		let value = document.createElement('span');
-		value.textContent = values[values.length-1] + container.getAttribute('data-unit');
+		value.textContent = values[values.length-1] + ' ' + container.getAttribute('data-unit');
 		p.appendChild(value);
 		measurements.appendChild(p);
 	}
@@ -144,7 +166,7 @@ function createGraphModule(title, unit, slag, interval, good, bad, min, max, cli
 	const graphModule = document.createElement('div');
 	graphModule.classList.add('container', 'graphmodule');
 	const headline = document.createElement('h1');
-	headline.textContent = title;
+	headline.textContent = title + ' (' + unit + ')';
 	graphModule.appendChild(headline);
 	
 	const graphContainer = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -189,11 +211,11 @@ function createGraphs() {
 			if (values[j] > max) max = values[j];
 		}
 		if (graph.getAttribute('data-clipping')==='false') {
-			if (min>graph.getAttribute('data-min')) {
-				if (graph.getAttribute('data-min')) min = graph.getAttribute('data-min');
+			if (graph.getAttribute('data-min') && min>graph.getAttribute('data-min')) {
+				min = graph.getAttribute('data-min');
 			}
-			if (max<graph.getAttribute('data-max')) {
-				if (graph.getAttribute('data-max')) max = graph.getAttribute('data-max');
+			if (graph.getAttribute('data-max') && max<graph.getAttribute('data-max')) {
+				max = graph.getAttribute('data-max');
 			}
 		} else {
 			if (graph.getAttribute('data-min')) min = graph.getAttribute('data-min');
@@ -218,14 +240,16 @@ function buildYLabels(container, graph, min, max, height, width) {
 	for(i=labels.length-1;i>=0;i--) {
 		labels[i].remove();
 	}
-	for(j=min;j<=max;j+=stepSize) {
-		const yPos = height-((j/max)*height);
-		const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-		label.textContent = j;
-		container.appendChild(label);
-		label.classList.add('labelY');
-		label.setAttribute('x',35-label.getBBox().width);
-		label.setAttribute('y',yPos);
+	for(j=0;j<=parseInt((max-min)/stepSize);j++) {
+		const yPos = height-((j/parseInt((max-min)/stepSize))*height);
+		if (yPos != NaN) {
+			const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+			label.textContent = (min + (j*stepSize));
+			container.appendChild(label);
+			label.classList.add('labelY');
+			label.setAttribute('x',35-label.getBBox().width);
+			label.setAttribute('y',yPos);
+		}
 	}
 	labels = container.getElementsByClassName('labelY');
 	const labelTop = labels[labels.length - 1];
@@ -256,33 +280,45 @@ function buildXLabels(container, graph, values, height, width) {
 		const timestamp = date.getTime();
 		const time = new Date(timestamp - (timestamp - offset));
 		const timeText = (time.getHours()<10?'0':'')+time.getHours()+':'+(time.getMinutes()<10?'0':'')+time.getMinutes();
-		
+
 		const xPos = (width-((j/values.length)*width)+35);
-		const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-		label.textContent = timeText;
-		container.appendChild(label);
-		label.classList.add('labelX');
-		label.setAttribute('x',xPos);
-		label.setAttribute('y',height+20);
+		if (xPos != NaN) {
+			const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+			label.textContent = timeText;
+			container.appendChild(label);
+			label.classList.add('labelX');
+			label.setAttribute('x',xPos);
+			label.setAttribute('y',height+20);
+		}
 	}
 	labels = container.getElementsByClassName('labelX');
 	const labelRight = labels[0];
 	if (labelRight) {
 		if ((labelRight.getBBox().x+labelRight.getBBox().width) > container.getBBox().width) {
 			labelRight.setAttribute('x',container.getBBox().width-(labelRight.getBBox().width*2));
+			if (labels[1]) { labels[1].remove(); }
 		}
 	}
 }
 function buildGraph(graph, values, min, max, height, width) {
+	let dots = graph.parentNode.getElementsByTagName('circle');
+	while (dots[0]) {
+		dots[0].parentNode.removeChild(dots[0]);
+	}
 	let points = '';
 	width = width - 40;
 	height = height - 20;
 	points += `40,${height} `;
 	for(i=0;i<values.length;i++){
-		if (i == values.length-1) {
-			points += `${(width/(values.length-1))*i + 43},${height*(1-((values[i]-min)/max))} `;
-		} else {
-			points += `${(width/(values.length-1))*i + 40},${height*(1-((values[i]-min)/max))} `;
+		let offset = 40
+		if (i == values.length-1) { offset = 43; }
+		points += `${(width/(values.length-1))*i + offset},${height*(1-((values[i]-min)/(max-min)))} `;
+		const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+		const dotX = (width/(values.length-1))*i + offset;
+		if (dotX != NaN) {
+			dot.setAttribute('cx', dotX);
+			dot.setAttribute('cy', height*(1-((values[i]-min)/(max-min))));
+			graph.parentNode.appendChild(dot);
 		}
 	}
 	points += `${width + 43},${height} `;
@@ -308,50 +344,87 @@ function detailedView(i, container, graph, frame, values) {
 			createDetailedPointer(i, container, parseInt(frame.getBBox().width*perc)+40);
 			createDetailedLabel(i, container, graph, parseInt(frame.getBBox().width*perc)+40, values, valueIndex);
 		}else{
-			if(document.getElementById('detailPointer'+i)){document.getElementById('detailPointer'+i).remove();}
-			if(document.getElementById('detailLabelRect'+i)){document.getElementById('detailLabelRect'+i).remove();}
-			if(document.getElementById('detailLabelText'+i)){document.getElementById('detailLabelText'+i).remove();}
+			const dPointer = container.getElementsByClassName('detailPointer');
+			const dRect = container.getElementsByClassName('detailLabelRect');
+			const dLabels = container.getElementsByClassName('detailLabelText');
+			while (dPointer[0]) {
+				dPointer[0].parentNode.removeChild(dPointer[0]);
+			}
+			while (dRect[0]) {
+				dRect[0].parentNode.removeChild(dRect[0]);
+			}
+			while (dLabels[0]) {
+				dLabels[0].parentNode.removeChild(dLabels[0]);
+			}
 		}
 	}, false);
 }
 function createDetailedPointer(i, container, pos) {
 	var height = container.clientHeight;
 	var width = container.clientWidth;
-	if(document.getElementById('detailPointer'+i)){document.getElementById('detailPointer'+i).remove();}
+	const dPointer = container.getElementsByClassName('detailPointer');
+	while (dPointer[0]) {
+		dPointer[0].parentNode.removeChild(dPointer[0]);
+	}
 	const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
 	poly.classList.add('detailPointer');
-	poly.setAttribute('id', 'detailPointer'+i);
 	container.appendChild(poly);
+	const dots = container.getElementsByTagName('circle');
+	let nearDotPos = (dots[0].getBBox().x + (dots[0].getBBox().width/2));
+	let dist = Math.abs(pos - dots[0].getBBox().x);
+	for(i=0;i<dots.length;i++){
+		const tempDist = Math.abs(pos - dots[i].getBBox().x);
+		if(tempDist<dist) { 
+			dist = tempDist;
+			nearDotPos = (dots[i].getBBox().x + (dots[i].getBBox().width/2));
+		}
+	}
 	const p1 = container.createSVGPoint();
-	p1.x = pos;
+	p1.x = nearDotPos
 	p1.y = height - 20;
 	const p2 = container.createSVGPoint();
-	p2.x = pos;
+	p2.x = nearDotPos;
 	p2.y = 0;
-	poly.points.appendItem(p1);
-	poly.points.appendItem(p2);
+	if (nearDotPos != NaN) {
+		poly.points.appendItem(p1);
+		poly.points.appendItem(p2);
+	}
 }
 function createDetailedLabel(i, container, graph, pos, values, valueIndex) {
-	if(document.getElementById('detailLabelRect'+i)){document.getElementById('detailLabelRect'+i).remove();}
+	const dRect = container.getElementsByClassName('detailLabelRect');
+	while (dRect[0]) {
+		dRect[0].parentNode.removeChild(dRect[0]);
+	}
 	const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-	rect.classList.add('detailLabel');
-	rect.setAttribute('id', 'detailLabelRect'+i);
+	rect.classList.add('detailLabel', 'detailLabelRect');
 	container.appendChild(rect);
 	rect.setAttribute('width', 120);
 	rect.setAttribute('height', 40);
 	rect.setAttribute('rx', 10);
 	rect.setAttribute('y', 1);
-	rect.setAttribute('x', pos-(rect.getBBox().width/2));
+	const dots = container.getElementsByTagName('circle');
+	let nearDotPos = (dots[0].getBBox().x + (dots[0].getBBox().width/2));
+	let dist = Math.abs(pos - dots[0].getBBox().x);
+	for(i=0;i<dots.length;i++){
+		const tempDist = Math.abs(pos - dots[i].getBBox().x);
+		if(tempDist<dist) { 
+			dist = tempDist;
+			nearDotPos = (dots[i].getBBox().x + (dots[i].getBBox().width/2));
+		}
+	}
+	rect.setAttribute('x', nearDotPos-(rect.getBBox().width/2));
 	// offset correction on boundries
 	if ((rect.getBBox().x+rect.getBBox().width)+3 > (graph.getBBox().x+graph.getBBox().width)) { rect.setAttribute('x', ((graph.getBBox().x+graph.getBBox().width)-rect.getBBox().width-3))}
 	if (rect.getBBox().x < 40) { rect.setAttribute('x', 40)}
-	if(document.getElementById('detailLabelText'+i)){document.getElementById('detailLabelText'+i).remove();}
+	const dLabels = container.getElementsByClassName('detailLabelText');
+	while (dLabels[0]) {
+		dLabels[0].parentNode.removeChild(dLabels[0]);
+	}
 	const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-	text.classList.add('label');
-	text.setAttribute('id', 'detailLabelText'+i);
+	text.classList.add('label', 'detailLabelText');
 	container.appendChild(text);
 	const valueView = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-	valueView.textContent = values[valueIndex] + container.getAttribute('data-unit');
+	valueView.textContent = values[valueIndex] + ' ' + container.getAttribute('data-unit');
 	valueView.setAttribute('x', rect.getBBox().x + 5);
 	valueView.setAttribute('y', rect.getBBox().y + 15);
 	const valueoffset = (values.length-valueIndex)*1000*graph.getAttribute('data-cycle');

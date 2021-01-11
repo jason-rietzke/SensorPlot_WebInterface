@@ -8,7 +8,7 @@
 SensorPlot_WebInterface::SensorPlot_WebInterface() {
 }
 
-void SensorPlot_WebInterface::addPlot(String title, String unit, int interval, int good, int bad, int min, int max, int stepsize, int cycle, int cycleStepsize, int *valuesCount, int *values, int *valuesMeasurmentMillis) {
+void SensorPlot_WebInterface::addPlot(String title, String unit, int interval, int good, int bad, int min, int max, int stepsize, int cycle, int cycleStepsize, int *valuesCount, float *values, int *valuesMeasurmentMillis) {
     if (this->plotterCount > 31) {
         return;
     }
@@ -34,7 +34,7 @@ void SensorPlot_WebInterface::addPlot(String title, String unit, int interval, i
     this->plotterCount ++;
 }
 
-void SensorPlot_WebInterface::serverResponseSetup(ESP8266WebServer *server) {
+void SensorPlot_WebInterface::serverResponseSetup(ESP8266WebServer *server, int (*callback)(String response)) {
     this->server = server;
     
     this->server->on("/", [=]() {
@@ -48,6 +48,17 @@ void SensorPlot_WebInterface::serverResponseSetup(ESP8266WebServer *server) {
     });
     this->server->on("/app.js", [=]() {
         responseJS();
+    });
+
+    this->server->on("/callback", [=]() {
+        if (this->server->hasArg("password")) {
+            int res = (*callback)(this->server->arg("password"));
+            this->server->setContentLength(CONTENT_LENGTH_UNKNOWN);
+            this->server->send(200, "text/plain", String(res));
+        } else {
+            this->server->setContentLength(CONTENT_LENGTH_UNKNOWN);
+            this->server->send(200, "text/plain", "0");
+        }
     });
     
     this->server->on("/graphData", [=]() {

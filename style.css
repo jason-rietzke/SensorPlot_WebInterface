@@ -58,6 +58,16 @@ h2 {
 	font-weight: 600;
 	font-size: 24px;
 }
+p {
+	font-size: 20px;
+}
+input {
+	background-color: var(--backgroundSecondaryColor);
+	color: var(--foregroundSecondaryColor);
+	border-style: solid;
+	border-width: 2px;
+	border-radius: 5px;
+}
 .container {
 	width: var(--outterViewWidth);
 	margin: var(--outterMargin);
@@ -86,7 +96,8 @@ h2 {
 	float: var(--smileyFloat);
 }
 .face {
-	fill: #ffe600;
+	--smileyColor: #ffe600;
+	fill: var(--smileyColor);
 	r: calc(var(--smileySize)/2);
 }
 .eye {
@@ -118,6 +129,10 @@ h2 {
 	stroke: var(--foregroundPrimaryColor);
 	stroke-width: 5px;
 	stroke-linecap: round;
+}
+circle {
+	fill: var(--foregroundPrimaryColor);
+	r: 5px;
 }
 .label {
 	fill: var(--foregroundPrimaryColor);
