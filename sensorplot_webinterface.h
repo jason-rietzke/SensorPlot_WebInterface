@@ -38,6 +38,7 @@ class SensorPlot_WebInterface {
         void responseJS();
         void responseGraphData();
         void responseGraphSlag(int index);
+        void responseCSV(int index);
 
         const String HTML = "<html>\n\
 	<head>\n\
@@ -127,6 +128,9 @@ h2 {\n\
 	color: var(--foregroundSecondaryColor);\n\
 	font-weight: 600;\n\
 	font-size: 24px;\n\
+}\n\
+a {\n\
+	color: var(--foregroundSecondaryColor);\n\
 }\n\
 p {\n\
 	font-size: 20px;\n\
@@ -399,6 +403,12 @@ function createGraphModule(title, unit, slag, interval, good, bad, min, max, cli
 	headline.textContent = title + ' (' + unit + ')';\n\
 	graphModule.appendChild(headline);\n\
 	\n\
+	const csvLink = document.createElement('a');\n\
+	csvLink.setAttribute('href', '/csv/' + slag);\n\
+	csvLink.setAttribute('target', '_blank');\n\
+	csvLink.textContent = 'download csv';\n\
+	graphModule.appendChild(csvLink);\n\
+    \n\
 	const graphContainer = document.createElementNS('http://www.w3.org/2000/svg', 'svg');\n\
 	graphContainer.classList.add('graphContainer');\n\
 	graphContainer.setAttribute('data-title', title);\n\

@@ -58,6 +58,9 @@ h2 {
 	font-weight: 600;
 	font-size: 24px;
 }
+a {
+	color: var(--foregroundSecondaryColor);
+}
 p {
 	font-size: 20px;
 }

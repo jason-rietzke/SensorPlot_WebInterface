@@ -69,6 +69,9 @@ void SensorPlot_WebInterface::serverResponseSetup(ESP8266WebServer *server, int 
         this->server->on("/data/" + String(i), [=]() {
             responseGraphSlag(i);
         });
+        this->server->on("/csv/" + String(i), [=]() {
+            responseCSV(i);
+        });
     }
 }
 
@@ -133,4 +136,27 @@ void SensorPlot_WebInterface::responseGraphSlag(int index) {
     
     this->server->setContentLength(CONTENT_LENGTH_UNKNOWN);
     this->server->send(200, "text/plain", response);
+}
+
+void SensorPlot_WebInterface::responseCSV(int index) {
+    String response;
+    response = "";
+
+    response += (this->plotter_p[index]->title + " (" + this->plotter_p[index]->unit + ") \r\n");
+    response += "Zeit: \tMesswert: \r\n";
+    for(int i = 0; i < *(this->plotter_p[index]->valuesCount); i++) {
+        response += (String(this->plotter_p[index]->interval * i) + " sec");
+        response += "\t";
+        response += (String(this->plotter_p[index]->values[i]) + " " + this->plotter_p[index]->unit);
+        response += "\r\n";
+    }
+    
+    this->server->sendHeader("Cache-Control", "no-cach, no-store, must-revalidate");
+    this->server->sendHeader("Progma", "no-cach");
+    this->server->sendHeader("Expires", "0");
+    this->server->sendHeader("Content-Disposition", "attachment; filename=\"" + this->plotter_p[index]->title + ".csv\"");
+    this->server->sendHeader("Content-Type", "charset=utf-8");
+    this->server->sendHeader("Connection", "close");
+    this->server->setContentLength(CONTENT_LENGTH_UNKNOWN);
+    this->server->send(200, "text/csv;charset=utf-8", response);
 }

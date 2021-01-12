@@ -168,6 +168,12 @@ function createGraphModule(title, unit, slag, interval, good, bad, min, max, cli
 	const headline = document.createElement('h1');
 	headline.textContent = title + ' (' + unit + ')';
 	graphModule.appendChild(headline);
+
+	const csvLink = document.createElement('a');
+	csvLink.setAttribute('href', '/csv/' + slag);
+	csvLink.setAttribute('target', '_blank');
+	csvLink.textContent = 'download csv';
+	graphModule.appendChild(csvLink);
 	
 	const graphContainer = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
 	graphContainer.classList.add('graphContainer');
