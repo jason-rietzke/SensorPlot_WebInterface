@@ -5,7 +5,8 @@
 #include <ESP8266WebServer.h>
 #include <string.h>
 
-SensorPlot_WebInterface::SensorPlot_WebInterface() {
+SensorPlot_WebInterface::SensorPlot_WebInterface(String websiteTitle) {
+    this->websiteTitle = websiteTitle;
 }
 
 void SensorPlot_WebInterface::addPlot(String title, String unit, int interval, int good, int bad, int min, int max, int stepsize, int cycle, int cycleStepsize, int *valuesCount, float *values, int *valuesMeasurmentMillis) {
@@ -93,6 +94,9 @@ void SensorPlot_WebInterface::responseJS() {
 void SensorPlot_WebInterface::responseGraphData() {
     String response;
     response = "";
+
+    response += this->websiteTitle;
+    response += "/";
 
     for(int i = 0; i < this->plotterCount; i++) {
         String clipping;

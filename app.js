@@ -47,7 +47,9 @@ function loadGraphs() {
 	let webClient = new XMLHttpRequest();
 	webClient.open('GET', '/graphData');
 	webClient.addEventListener('load', function(event) {
-		const graphs = webClient.responseText.split(';');
+		const resp = webClient.responseText.split('/');
+		document.title = resp[0];
+		const graphs = resp[1].split(';');
 		for(i=0;i<graphs.length;i++){
 			const graph = graphs[i];
 			const data = graph.split(',');

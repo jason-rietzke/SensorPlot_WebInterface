@@ -30,6 +30,7 @@ typedef struct Sensor_Plot_S {
 
 class SensorPlot_WebInterface {
     private:
+		String websiteTitle = "";
         int plotterCount = 0;
         Sensor_Plot *plotter_p[32];
         ESP8266WebServer *server;
@@ -281,7 +282,9 @@ function loadGraphs() {\n\
 	let webClient = new XMLHttpRequest();\n\
 	webClient.open('GET', '/graphData');\n\
 	webClient.addEventListener('load', function(event) {\n\
-		const graphs = webClient.responseText.split(';');\n\
+		const resp = webClient.responseText.split('/');\n\
+		document.title = resp[0];\n\
+		const graphs = resp[1].split(';');\n\
 		for(i=0;i<graphs.length;i++){\n\
 			const graph = graphs[i];\n\
 			const data = graph.split(',');\n\
@@ -682,7 +685,7 @@ function createDetailedLabel(i, container, graph, pos, values, valueIndex) {\n\
 }";
 
     public: 
-        SensorPlot_WebInterface();
+        SensorPlot_WebInterface(String websiteTitle);
         void addPlot(String title, String unit, int interval, int good, int bad, int min, int max, int stepsize, int cycle, int cycleStepsize, int *valuesCount, float *values, int *valuesMeasurmentMillis);
         void serverResponseSetup(ESP8266WebServer *server, int (*callback)(String response));
 };
