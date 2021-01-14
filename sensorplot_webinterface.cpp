@@ -34,9 +34,14 @@ void SensorPlot_WebInterface::addPlot(String title, String unit, int interval, i
     this->plotterCount ++;
 }
 
-void SensorPlot_WebInterface::serverResponseSetup(ESP8266WebServer *server, String websiteTitle, int (*callback)(String response)) {
-    this->server = server;
+void SensorPlot_WebInterface::interfaceConfig(String websiteTitle, String callbackInput, String callbackButton) {
     this->websiteTitle = websiteTitle;
+    this->callbackInput = callbackInput;
+    this->callbackButton = callbackButton;
+}
+
+void SensorPlot_WebInterface::serverResponseSetup(ESP8266WebServer *server, int (*callback)(String response)) {
+    this->server = server;
     
     this->server->on("/", [=]() {
         responseHTML();
@@ -51,9 +56,13 @@ void SensorPlot_WebInterface::serverResponseSetup(ESP8266WebServer *server, Stri
         responseJS();
     });
 
+    this->server->on("/config", [=]() {
+        responseConfig();
+    });
+
     this->server->on("/callback", [=]() {
-        if (this->server->hasArg("password")) {
-            int res = (*callback)(this->server->arg("password"));
+        if (this->server->hasArg("input")) {
+            int res = (*callback)(this->server->arg("input"));
             this->server->setContentLength(CONTENT_LENGTH_UNKNOWN);
             this->server->send(200, "text/plain", String(res));
         } else {
@@ -89,6 +98,20 @@ void SensorPlot_WebInterface::responseCSS() {
 void SensorPlot_WebInterface::responseJS() {
     this->server->setContentLength(CONTENT_LENGTH_UNKNOWN);
     this->server->send(200, "text/javascript", this->JavaScript);
+}
+
+void SensorPlot_WebInterface::responseConfig() {
+    String response;
+    response = "";
+
+    response += this->websiteTitle;
+    response += ";";
+    response += this->callbackInput;
+    response += ";";
+    response += this->callbackButton;
+
+    this->server->setContentLength(CONTENT_LENGTH_UNKNOWN);
+    this->server->send(200, "text/plain", response);
 }
 
 void SensorPlot_WebInterface::responseGraphData() {

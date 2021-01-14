@@ -24,12 +24,13 @@ function setup() {
 	setTimeout(() => {
 		setMouth();
 	}, 500);
+	loadConfig();
 	loadGraphs();
 }
 // loading callback result from server
 function performCallback() {
 	let webClient = new XMLHttpRequest();
-	webClient.open('POST', '/callback?password=' + document.getElementById('callbackPassword').value);
+	webClient.open('POST', '/callback?input=' + document.getElementById('callbackInput').value);
 	webClient.addEventListener('load', function(event) {
 		let color = 'var(--foregroundSecondaryColor)';
 		if (webClient.responseText == '0') {
@@ -37,8 +38,20 @@ function performCallback() {
 		} else if (webClient.responseText == '1') {
 			color = 'green';
 		}
-		document.getElementById('callbackPassword').style.borderColor = color;
+		document.getElementById('callbackInput').style.borderColor = color;
 		document.getElementById('callbackButton').style.borderColor = color;
+	});
+	webClient.send();
+}
+// loading configdata from server
+function loadConfig() {
+	let webClient = new XMLHttpRequest();
+	webClient.open('GET', '/config');
+	webClient.addEventListener('load', function(event) {
+		const config = webClient.responseText.split(';');
+		document.title = config[0];
+		document.getElementById('callbackInput').setAttribute('placeholder', config[1]);
+		document.getElementById('callbackButton').value = config[2];
 	});
 	webClient.send();
 }
@@ -47,9 +60,7 @@ function loadGraphs() {
 	let webClient = new XMLHttpRequest();
 	webClient.open('GET', '/graphData');
 	webClient.addEventListener('load', function(event) {
-		const resp = webClient.responseText.split('/');
-		document.title = resp[0];
-		const graphs = resp[1].split(';');
+		const graphs = webClient.responseText.split(';');
 		for(i=0;i<graphs.length;i++){
 			const graph = graphs[i];
 			const data = graph.split(',');

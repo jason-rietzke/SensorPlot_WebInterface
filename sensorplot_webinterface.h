@@ -31,12 +31,16 @@ typedef struct Sensor_Plot_S {
 class SensorPlot_WebInterface {
     private:
 		String websiteTitle = "";
+		String callbackInput = "";
+		String callbackButton = "";
+
         int plotterCount = 0;
         Sensor_Plot *plotter_p[32];
         ESP8266WebServer *server;
         void responseHTML();
         void responseCSS();
         void responseJS();
+        void responseConfig();
         void responseGraphData();
         void responseGraphSlag(int index);
         void responseCSV(int index);
@@ -60,8 +64,8 @@ class SensorPlot_WebInterface {
 				<h1>Aktuelle Messwerte</h1>\n\
 				<div class='measurements'></div>\n\
 				<div>\n\
-					<input type='text' placeholder='password' name='password' id='callbackPassword'>\n\
-					<input type='button' value='Kalbrieren' id='callbackButton'>\n\
+					<input type='text' placeholder='input' name='input' id='callbackInput'>\n\
+					<input type='button' value='Perform' id='callbackButton'>\n\
 				</div>\n\
 			</div>\n\
 		</div>\n\
@@ -259,12 +263,13 @@ function setup() {\n\
 	setTimeout(() => {\n\
 		setMouth();\n\
 	}, 500);\n\
+	loadConfig();\n\
 	loadGraphs();\n\
 }\n\
 // loading callback result from server\n\
 function performCallback() {\n\
 	let webClient = new XMLHttpRequest();\n\
-	webClient.open('POST', '/callback?password=' + document.getElementById('callbackPassword').value);\n\
+	webClient.open('POST', '/callback?input=' + document.getElementById('callbackInput').value);\n\
 	webClient.addEventListener('load', function(event) {\n\
 		let color = 'var(--foregroundSecondaryColor)';\n\
 		if (webClient.responseText == '0') {\n\
@@ -272,8 +277,20 @@ function performCallback() {\n\
 		} else if (webClient.responseText == '1') {\n\
 			color = 'green';\n\
 		}\n\
-		document.getElementById('callbackPassword').style.borderColor = color;\n\
+		document.getElementById('callbackInput').style.borderColor = color;\n\
 		document.getElementById('callbackButton').style.borderColor = color;\n\
+	});\n\
+	webClient.send();\n\
+}\n\
+// loading configdata from server\n\
+function loadConfig() {\n\
+	let webClient = new XMLHttpRequest();\n\
+	webClient.open('GET', '/config');\n\
+	webClient.addEventListener('load', function(event) {\n\
+		const config = webClient.responseText.split(';');\n\
+		document.title = config[0];\n\
+		document.getElementById('callbackInput').setAttribute('placeholder', config[1]);\n\
+		document.getElementById('callbackButton').value = config[2];\n\
 	});\n\
 	webClient.send();\n\
 }\n\
@@ -282,9 +299,7 @@ function loadGraphs() {\n\
 	let webClient = new XMLHttpRequest();\n\
 	webClient.open('GET', '/graphData');\n\
 	webClient.addEventListener('load', function(event) {\n\
-		const resp = webClient.responseText.split('/');\n\
-		document.title = resp[0];\n\
-		const graphs = resp[1].split(';');\n\
+		const graphs = webClient.responseText.split(';');\n\
 		for(i=0;i<graphs.length;i++){\n\
 			const graph = graphs[i];\n\
 			const data = graph.split(',');\n\
@@ -405,13 +420,13 @@ function createGraphModule(title, unit, slag, interval, good, bad, min, max, cli
 	const headline = document.createElement('h1');\n\
 	headline.textContent = title + ' (' + unit + ')';\n\
 	graphModule.appendChild(headline);\n\
-	\n\
+\n\
 	const csvLink = document.createElement('a');\n\
 	csvLink.setAttribute('href', '/csv/' + slag);\n\
 	csvLink.setAttribute('target', '_blank');\n\
 	csvLink.textContent = 'download csv';\n\
 	graphModule.appendChild(csvLink);\n\
-    \n\
+	\n\
 	const graphContainer = document.createElementNS('http://www.w3.org/2000/svg', 'svg');\n\
 	graphContainer.classList.add('graphContainer');\n\
 	graphContainer.setAttribute('data-title', title);\n\
@@ -524,7 +539,7 @@ function buildXLabels(container, graph, values, height, width) {\n\
 		const time = new Date(timestamp - (timestamp - offset));\n\
 		const timeText = (time.getHours()<10?'0':'')+time.getHours()+':'+(time.getMinutes()<10?'0':'')+time.getMinutes();\n\
 \n\
-        const xPos = (width-((j/values.length)*width)+35);\n\
+		const xPos = (width-((j/values.length)*width)+35);\n\
 		if (xPos != NaN) {\n\
 			const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');\n\
 			label.textContent = timeText;\n\
@@ -539,7 +554,7 @@ function buildXLabels(container, graph, values, height, width) {\n\
 	if (labelRight) {\n\
 		if ((labelRight.getBBox().x+labelRight.getBBox().width) > container.getBBox().width) {\n\
 			labelRight.setAttribute('x',container.getBBox().width-(labelRight.getBBox().width*2));\n\
-            if (labels[1]) { labels[1].remove(); }\n\
+			if (labels[1]) { labels[1].remove(); }\n\
 		}\n\
 	}\n\
 }\n\
@@ -687,7 +702,8 @@ function createDetailedLabel(i, container, graph, pos, values, valueIndex) {\n\
     public: 
         SensorPlot_WebInterface();
         void addPlot(String title, String unit, int interval, int good, int bad, int min, int max, int stepsize, int cycle, int cycleStepsize, int *valuesCount, float *values, int *valuesMeasurmentMillis);
-        void serverResponseSetup(ESP8266WebServer *server, String websiteTitle, int (*callback)(String response));
+		void interfaceConfig(String websiteTitle, String callbackInput, String callbackButton);
+        void serverResponseSetup(ESP8266WebServer *server, int (*callback)(String response));
 };
 
 #endif
