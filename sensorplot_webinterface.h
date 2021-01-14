@@ -685,9 +685,9 @@ function createDetailedLabel(i, container, graph, pos, values, valueIndex) {\n\
 }";
 
     public: 
-        SensorPlot_WebInterface(String websiteTitle);
+        SensorPlot_WebInterface();
         void addPlot(String title, String unit, int interval, int good, int bad, int min, int max, int stepsize, int cycle, int cycleStepsize, int *valuesCount, float *values, int *valuesMeasurmentMillis);
-        void serverResponseSetup(ESP8266WebServer *server, int (*callback)(String response));
+        void serverResponseSetup(ESP8266WebServer *server, String websiteTitle, int (*callback)(String response));
 };
 
 #endif
