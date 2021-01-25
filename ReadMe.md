@@ -16,7 +16,7 @@ Furthermore the webinterface also supports light and dark mode, automatically de
 
 ## How to use it
 This project depends on the ESP8266WebServer lib to create the server.
-This repo contains a SensorPlot_WebInterface_ConfigExample.ino file where you can check out a easy example how to implement this library.
+This repo contains a SensorPlot_WebInterface_ConfigExample.ino file where you can check out an easy example how to implement this library.
 More detailed information about how to use it are here:
 
 
@@ -44,7 +44,7 @@ They can be added by calling the ``addPlot("Name", "Unit", interval, goodThresho
 |9. Cycle Duration | Int | in which interval are the values measured in seconds (e.g. cycleDuration = 60 | measurements are 1 minute apart)|
 |10. Cycle Stepsize | Int | at which interval should the X-Axis labels be displayed (e.g. cycleStepsize = 300 | the labels are 5 minutes apart)|
 |11. Measurements Counter Pointer | *Int | a pointer onto the counter of measurements tracked from this sensor|
-|12. Measurements Pointer | *Int | a pointer onto the array containing the measurements from this sensor|
+|12. Measurements Pointer | *Float | a pointer onto the array containing the measurements from this sensor|
 |13. Measurements Timestamp Pointer | *Int | a pointer onto the timestamp of the last measurement done with this sensor (millis since last measurement to calculate the time)|
 
 
