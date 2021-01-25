@@ -21,7 +21,7 @@ const char SENSORPLOT_HTML_RAW[] PROGMEM = {"<html>\n\
 				<path class='mouth' id='mouth'/>\n\
 			</svg>\n\
 			<div class='measurementsContainer'>\n\
-				<h1>Aktuelle Messwerte</h1>\n\
+				<h1>Latest Measurements</h1>\n\
 				<div class='measurements'></div>\n\
 				<div>\n\
 					<input type='text' placeholder='input' name='input' id='callbackInput'>\n\
