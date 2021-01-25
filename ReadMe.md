@@ -31,21 +31,21 @@ After instantiating the ESP8266WebServer and the SensorPlot_WebInterface you hav
 Next you have to define all the Sensor-Plots you want to display on the interface. You can add up to 32 of them.
 They can be added by calling the ``addPlot("Name", "Unit", interval, goodThreshold, badThreshold, min, max, stepsize, cycleDuration, cycleStepsize, &measurementsCount, measurements, &measurementsTimestamp)`` method which takes 13 arguments.
 
-Argument | Type | Description
---|--|---
-1. The Sensor Name | String | how this measurement is called (e.g. "CO2 Concentration")
-2. Sensor Unit | String | what this value is measured in (e.g. "ppm - parts per million")
-3. Reload Interval | Int | in which interval shoud the webinterface reload the sensore data form the server (often same as cycleDuration)
-4. Good Threshold | Int | up to which value can this measurement be considered as good
-5. Bad Threshold | Int | at which value can this measurement be considered as bad
-6. Min Graph-Value | Int | the minimum Y-Axis value that is static on the graph (gets overriden, when reaching this border)
-7. Max Graph-Value | Int | the maximum Y-Axis value that is static on the graph (gets overriden, when reaching this border)
-8. Graph Stepsize | Int | at which interval should the Y-Axis labels be displayed (e.g. 0 - 200 - 400 - 600 [stepszie = 200])
-9. Cycle Duration | Int | in which interval are the values measured in seconds (e.g. cycleDuration = 60 | measurements are 1 minute apart)
-10. Cycle Stepsize | Int | at which interval should the X-Axis labels be displayed (e.g. cycleStepsize = 300 | the labels are 5 minutes apart)
-11. Measurements Counter Pointer | *Int | a pointer onto the counter of measurements tracked from this sensor
-12. Measurements Pointer | *Int | a pointer onto the array containing the measurements from this sensor
-13. Measurements Timestamp Pointer | *Int | a pointer onto the timestamp of the last measurement done with this sensor (millis since last measurement to calculate the time)
+|Argument | Type | Description|
+|--|--|---|
+|1. The Sensor Name | String | how this measurement is called (e.g. "CO2 Concentration")|
+|2. Sensor Unit | String | what this value is measured in (e.g. "ppm - parts per million")|
+|3. Reload Interval | Int | in which interval shoud the webinterface reload the sensore data form the server (often same as cycleDuration)|
+|4. Good Threshold | Int | up to which value can this measurement be considered as good|
+|5. Bad Threshold | Int | at which value can this measurement be considered as bad|
+|6. Min Graph-Value | Int | the minimum Y-Axis value that is static on the graph (gets overriden, when reaching this border)|
+|7. Max Graph-Value | Int | the maximum Y-Axis value that is static on the graph (gets overriden, when reaching this border)|
+|8. Graph Stepsize | Int | at which interval should the Y-Axis labels be displayed (e.g. 0 - 200 - 400 - 600 [stepszie = 200])|
+|9. Cycle Duration | Int | in which interval are the values measured in seconds (e.g. cycleDuration = 60 | measurements are 1 minute apart)|
+|10. Cycle Stepsize | Int | at which interval should the X-Axis labels be displayed (e.g. cycleStepsize = 300 | the labels are 5 minutes apart)|
+|11. Measurements Counter Pointer | *Int | a pointer onto the counter of measurements tracked from this sensor|
+|12. Measurements Pointer | *Int | a pointer onto the array containing the measurements from this sensor|
+|13. Measurements Timestamp Pointer | *Int | a pointer onto the timestamp of the last measurement done with this sensor (millis since last measurement to calculate the time)|
 
 
 #### Step 3 - response setup
