@@ -93,7 +93,12 @@ void setup() {
   sensorReading1();
   sensorReading2();
 
-  WiFi.softAP("WiFi SSID","WiFi Password");
+  WiFi.begin("WiFi SSID", "WiFi Password");
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+
   Serial.print("AccessPoint SSID:"); Serial.print("WiFi SSID");
   Serial.println (" - IP:"+ WiFi.softAPIP().toString());
 }
