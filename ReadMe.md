@@ -1,6 +1,6 @@
 # SensorPlot WebInterface
 
-<img src="/Graph_with_Cursor.png" alt="Sensor-Graph with Info-Cursor Image" title="Sensor-Graph with Info-Cursor" width="75%">
+<img src="/documentation/Graph_with_Cursor.png" alt="Sensor-Graph with Info-Cursor Image" title="Sensor-Graph with Info-Cursor" width="75%">
 
 ## Description
 The SensorPlot_WebInterface C++ library is made to be used on any Ardunio like microcontroller to make up a webinterface.
