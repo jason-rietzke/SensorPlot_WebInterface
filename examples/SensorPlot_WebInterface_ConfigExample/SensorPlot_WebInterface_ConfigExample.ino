@@ -98,9 +98,11 @@ void setup() {
     delay(500);
     Serial.print(".");
   }
-
-  Serial.print("AccessPoint SSID:"); Serial.print("WiFi SSID");
-  Serial.println (" - IP:"+ WiFi.softAPIP().toString());
+  Serial.println("connected");
+  Serial.print("Use this URL: ");
+  Serial.print("http://")
+  Serial.print(WiFi.localIP());
+  Serial.println("/");
 }
 
 
