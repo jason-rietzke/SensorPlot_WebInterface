@@ -25,7 +25,7 @@ void sensorReading(float *measurements, int *measurementsCount, int maxMeasureme
     measurements[(*measurementsCount - 1)] = sensorInput;
   } else {
     *measurementsCount = maxMeasurements;
-    for(int i = 0; i < (*measurementsCount - 2); i++) {
+    for(int i = 0; i < (*measurementsCount - 1); i++) {
       measurements[i] = measurements[i + 1];
     }
     measurements[(*measurementsCount - 1)] = sensorInput;
