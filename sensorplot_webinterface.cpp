@@ -641,7 +641,7 @@ function createDetailedLabel(i, container, graph, pos, values, valueIndex) {\n\
 	text.classList.add('label', 'detailLabelText');\n\
 	container.appendChild(text);\n\
 	const valueView = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');\n\
-	valueView.textContent = values[valueIndex] + ' ' + container.getAttribute('data-unit');\n\
+	valueView.textContent = (values[valueIndex] ? values[valueIndex] : values[values.length - 1]) + ' ' + container.getAttribute('data-unit');\n\
 	valueView.setAttribute('x', rect.getBBox().x + 5);\n\
 	valueView.setAttribute('y', rect.getBBox().y + 15);\n\
 	const valueoffset = (values.length-valueIndex)*1000*graph.getAttribute('data-cycle');\n\

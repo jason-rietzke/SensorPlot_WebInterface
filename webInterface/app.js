@@ -443,7 +443,7 @@ function createDetailedLabel(i, container, graph, pos, values, valueIndex) {
 	text.classList.add('label', 'detailLabelText');
 	container.appendChild(text);
 	const valueView = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-	valueView.textContent = values[valueIndex] + ' ' + container.getAttribute('data-unit');
+	valueView.textContent = (values[valueIndex] ? values[valueIndex] : values[values.length - 1]) + ' ' + container.getAttribute('data-unit');
 	valueView.setAttribute('x', rect.getBBox().x + 5);
 	valueView.setAttribute('y', rect.getBBox().y + 15);
 	const valueoffset = (values.length-valueIndex)*1000*graph.getAttribute('data-cycle');
