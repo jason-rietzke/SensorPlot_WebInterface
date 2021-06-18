@@ -57,6 +57,20 @@ This callback function receives a String containing the input text from the inpu
 
 ---
 
+## Widget View
+In some usecases it's very usefull not to see all data but summarize the sensor data of several rooms on one site.
+Therefore we created the Widget-View which for example can be included into another website by using iframes. You can reach the Widget-View by calling ``http://someIP/widget.html``.
+
+Example:
+``` html
+<body>
+	<iframe src="http://192.168.1.100/widget.html" style="height: 600px; width: calc(100vw - 80px);" frameborder="0"></iframe>
+</body>
+```
+> Note: You have to change the ``192.168.1.100`` to the correct IP address of your microcontroller.
+
+---
+
 ## Why has it been developed
 This library was developed as part of an open source project at the Trier University of Applied Sciences Environmental Campus Birkenfeld.
 The idea is to provide as many schools, universities as well as private person with a budget friendly way to build their own CO2-Concentration Measurement Stations. This should indicate when it's time to get fresh air, which got even more important throught to the Covid-Pandamic. 
