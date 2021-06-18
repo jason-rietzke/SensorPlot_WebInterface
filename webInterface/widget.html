@@ -1,9 +1,14 @@
 <html>
 	<head>
-		<title>Sensor-Plots</title>
+		<title>Sensor-Plots | Widget</title>
 		<meta charset='utf-16'>
 		<link rel='stylesheet' href='style.css'>
-		<script defer src='app.js'></script>
+		<script defer src='widget.js'></script>
+		<style>
+			body {
+				background-color: #00000000;
+			}
+		</style>
 	</head>
 	<body>
 		<div class='container'>
@@ -16,13 +21,7 @@
 			<div class='measurementsContainer'>
 				<h1 id="widgetTitle">Latest Measurements</h1>
 				<div class='measurements'></div>
-				<div>
-					<input type='text' placeholder='input' name='input' id='callbackInput'>
-					<input type='button' value='Perform' id='callbackButton'>
-				</div>
 			</div>
-		</div>
-		<div id='graphsContainer'>
 		</div>
 	</body>
 </html>

@@ -100,7 +100,7 @@ void setup() {
   }
   Serial.println("connected");
   Serial.print("Use this URL: ");
-  Serial.print("http://")
+  Serial.print("http://");
   Serial.print(WiFi.localIP());
   Serial.println("/");
 }

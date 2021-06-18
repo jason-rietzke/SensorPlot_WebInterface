@@ -50,6 +50,7 @@ function loadConfig() {
 	webClient.addEventListener('load', function(event) {
 		const config = webClient.responseText.split(';');
 		document.title = config[0];
+		document.getElementById('widgetTitle').textContent = config[0];
 		document.getElementById('callbackInput').setAttribute('placeholder', config[1]);
 		document.getElementById('callbackButton').value = config[2];
 	});

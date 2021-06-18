@@ -44,6 +44,9 @@ class SensorPlot_WebInterface {
         void responseGraphSlag(int index);
         void responseCSV(int index);
 
+        void responseWidgetHTML();
+        void responseWidgetJS();
+
     public: 
         SensorPlot_WebInterface();
         void addPlot(String title, String unit, int interval, int good, int bad, int min, int max, int stepsize, int cycle, int cycleStepsize, int *valuesCount, float *values, int *valuesMeasurmentMillis);
