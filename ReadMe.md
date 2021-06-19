@@ -1,16 +1,18 @@
 # SensorPlot WebInterface
 
-<img src="/documentation/Graph_with_Cursor.png" alt="Sensor-Graph with Info-Cursor Image" title="Sensor-Graph with Info-Cursor" width="75%">
-
 ## Description
 The SensorPlot_WebInterface C++ library is made to be used on any Ardunio like microcontroller to make up a webinterface.
 This interface is able to display up to 32 Plot-Graphs which represent sensor measurements. Each graph provides a *download csv* link which triggers a download of a CSV-File, containing all tracked Plot-Data of this sensor.
 
-As a summory on the top is a view, containing the latest sensor measurements and a smiley which represents the state of those values. If they are not good or even bad the smiley changes its mood from happy to neutral or sad. These thresholds, as well as Name, Unit, etc. can be configured when adding a Plot.
+As a summary on the top is a view, containing the latest sensor measurements and a smiley which represents the state of those values. If they are not good or even bad the smiley changes its mood from happy to neutral or sad. These thresholds, as well as Name, Unit, etc. can be configured when adding a Plot.
 
 By hovering over the graph, the Info-Cursor will show up and display detailed information about the measurement at this time. Displayed will be the exact value and time at which the measurement has been made.
 
-Furthermore the webinterface also supports light and dark mode, automatically detected by the system preferences as well as a mobile and desktop mode, which is determined by the window width. 
+Furthermore the webinterface also supports light and dark mode, automatically detected by the system preferences as well as a mobile and desktop mode, which is determined by the window width. Also it does support a new fearure where you can just use the summary header as a widget view within another website.
+
+<img src="/documentation/SPWI_Classroom_Header.png" alt="Summary Header displaying the current state" title="Summary-Header" width="90%">
+<img src="/documentation/SPWI_Classroom_CO2.png" alt="Sensor-Graph displaying the data over time" title="Sensor-Graph" width="45%">
+<img src="/documentation/SPWI_Classroom_CO2_Cursor.png" alt="Sensor-Graph with Info-Cursor" title="Info-Cursor" width="45%">
 
 ---
 
@@ -21,7 +23,7 @@ More detailed information about how to use it are here:
 
 
 #### Step 1 - configuration
-After instantiating the ESP8266WebServer and the SensorPlot_WebInterface you have to call the ``interfaceConfig("title", "input field", "perform action", unixTimestamp)`` method which takes 3 arguments.
+After instantiating the ESP8266WebServer and the SensorPlot_WebInterface you have to call the ``interfaceConfig("title", "input field", "perform action", unixTimestamp)`` method which takes 4 arguments.
 1. The Website Title, wich should be displayed in the browser
 2. Input Field, which is the placeholder text for the callback input field in the webinterface
 3. Perform Action, which is the text of the button, which triggers the callback with the input field's text as param
@@ -60,12 +62,14 @@ This callback function receives a String containing the input text from the inpu
 
 ## Widget View
 In some usecases it's very usefull not to see all data but summarize the sensor data of several rooms on one site.
-Therefore we created the Widget-View which for example can be included into another website by using iframes. You can reach the Widget-View by calling ``http://someIP/widget.html``.
+Therefore we created the Widget-View which for example can be included into another website by using iframes. You can reach the Widget-View by calling ``http://192.168.1.100/widget.html``.
 
-Example:
+<img src="/documentation/SPWI_Classroom_Widgets.png" alt="Widget-Views displaying the data of several rooms" title="Widget-Views" width="45%">
+
+Embetting:
 ``` html
 <body>
-	<iframe src="http://192.168.1.100/widget.html" style="height: 600px; width: calc(100vw - 80px);" frameborder="0"></iframe>
+	<iframe src="http://192.168.1.100/widget.html" style="height: 500px; width: 1200px;" frameborder="0"></iframe>
 </body>
 ```
 > Note: You have to change the ``192.168.1.100`` to the correct IP address of your microcontroller.
