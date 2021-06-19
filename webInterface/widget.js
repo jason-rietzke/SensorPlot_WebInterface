@@ -48,7 +48,7 @@ function loadGraphs() {
 			const graph = graphs[i];
 			const data = graph.split(',');
 			if(!(data.length < 12)){
-				Graphs.push({title: data[0], unit: data[1], slag: data[2], interval: data[3], good: data[4], bad: data[5], min: data[6], max: data[7], clipping: data[8], stepsize: data[9], cycle: data[10], cycleStepsize: data[11], value: 0});
+				Graphs.push({title: data[0], unit: data[1], slag: data[2], interval: data[3], good: parseInt(data[4]), bad: parseInt(data[5]), min: parseInt(data[6]), max: parseInt(data[7]), clipping: data[8], stepsize: parseInt(data[9]), cycle: parseInt(data[10]), cycleStepsize: parseInt(data[11]), value: 0});
 				loadData(data[3], data[2], 1);
 			}
 		}
@@ -64,7 +64,7 @@ function loadData(interval, slag, immediate = 0) {
 		webClient.open('GET', `/data/${slag}`);
 		webClient.addEventListener('load', function(event) {
 			const values = webClient.responseText.split(';')[1].split(',');
-			Graphs[slag].value = values[values.length - 1];
+			Graphs[slag].value = parseInt(values[values.length - 1]);
 			createMeasurements();
 			validateSmileyState();
 		});

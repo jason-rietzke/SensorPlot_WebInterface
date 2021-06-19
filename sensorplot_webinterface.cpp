@@ -738,7 +738,7 @@ function loadGraphs() {\n\
 			const graph = graphs[i];\n\
 			const data = graph.split(',');\n\
 			if(!(data.length < 12)){\n\
-				Graphs.push({title: data[0], unit: data[1], slag: data[2], interval: data[3], good: data[4], bad: data[5], min: data[6], max: data[7], clipping: data[8], stepsize: data[9], cycle: data[10], cycleStepsize: data[11], value: 0});\n\
+				Graphs.push({title: data[0], unit: data[1], slag: data[2], interval: data[3], good: parseInt(data[4]), bad: parseInt(data[5]), min: parseInt(data[6]), max: parseInt(data[7]), clipping: data[8], stepsize: parseInt(data[9]), cycle: parseInt(data[10]), cycleStepsize: parseInt(data[11]), value: 0});\n\
 				loadData(data[3], data[2], 1);\n\
 			}\n\
 		}\n\
@@ -754,7 +754,7 @@ function loadData(interval, slag, immediate = 0) {\n\
 		webClient.open('GET', `/data/${slag}`);\n\
 		webClient.addEventListener('load', function(event) {\n\
 			const values = webClient.responseText.split(';')[1].split(',');\n\
-			Graphs[slag].value = values[values.length - 1];\n\
+			Graphs[slag].value = parseInt(values[values.length - 1]);\n\
 			createMeasurements();\n\
 			validateSmileyState();\n\
 		});\n\
