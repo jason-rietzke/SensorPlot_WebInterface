@@ -93,7 +93,7 @@ void setup() {
   sensorReading1();
   sensorReading2();
 
-  WiFi.begin("WiFi SSID", "WiFi Password");
+  WiFi.begin("myWiFi", "myWiFiPassword");
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
