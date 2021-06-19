@@ -1014,13 +1014,16 @@ void SensorPlot_WebInterface::responseCSV(int index) {
     String response;
     response = "";
 
-    response += (this->plotter_p[index]->title + " (" + this->plotter_p[index]->unit + ") \r\n");
-    response += "Zeit: \tMesswert: \r\n";
+    response += (this->plotter_p[index]->title + " (" + this->plotter_p[index]->unit + ")\n");
+    response += "Time;Value\n";
     for(int i = 0; i < *(this->plotter_p[index]->valuesCount); i++) {
-        response += (String(this->plotter_p[index]->interval * i) + " sec");
-        response += "\t";
-        response += (String(this->plotter_p[index]->values[i]) + " " + this->plotter_p[index]->unit);
-        response += "\r\n";
+        if (this->unixTime > 0) { // unix time is set
+            response += ("=((" + (String(this->unixTime + (this->plotter_p[index]->interval * i))) + "/86400) + 25569);");
+        } else { // unix time is not set
+            response += "\"" + (String(this->plotter_p[index]->interval * i) + " sec\";");
+        }
+        response += "\"" + (String(this->plotter_p[index]->values[i]) + " " + this->plotter_p[index]->unit) + "\"";
+        response += "\n";
     }
     
     this->server->sendHeader("Cache-Control", "no-cach, no-store, must-revalidate");
