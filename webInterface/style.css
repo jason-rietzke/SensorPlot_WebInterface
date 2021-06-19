@@ -19,7 +19,7 @@
 }
 @media (min-width: 750px) {
 	* {
-		--outterViewWidth: calc(100vw - 120px);
+		--outterViewWidth: calc(100% - 120px);
 		--outterMargin: 40px;
 		--outterPadding: 20px;
 		--smileySize: 250px;
@@ -30,7 +30,7 @@
 }
 @media (max-width: 750px) {
 	* {
-		--outterViewWidth: calc(100vw - 60px);
+		--outterViewWidth: calc(100% - 60px);
 		--outterMargin: 20px;
 		--outterPadding: 10px;
 		--smileySize: 350px;

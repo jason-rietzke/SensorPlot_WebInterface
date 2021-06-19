@@ -54,7 +54,7 @@ const char SENSORPLOT_STYLESHEET_RAW[] PROGMEM = {"* {\n\
 }\n\
 @media (min-width: 750px) {\n\
     * {\n\
-        --outterViewWidth: calc(100vw - 120px);\n\
+        --outterViewWidth: calc(100% - 120px);\n\
         --outterMargin: 40px;\n\
         --outterPadding: 20px;\n\
         --smileySize: 250px;\n\
@@ -65,7 +65,7 @@ const char SENSORPLOT_STYLESHEET_RAW[] PROGMEM = {"* {\n\
 }\n\
 @media (max-width: 750px) {\n\
     * {\n\
-        --outterViewWidth: calc(100vw - 60px);\n\
+        --outterViewWidth: calc(100% - 60px);\n\
         --outterMargin: 20px;\n\
         --outterPadding: 10px;\n\
         --smileySize: 350px;\n\
