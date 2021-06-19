@@ -874,10 +874,11 @@ void SensorPlot_WebInterface::addPlot(String title, String unit, int interval, i
     this->plotterCount ++;
 }
 
-void SensorPlot_WebInterface::interfaceConfig(String websiteTitle, String callbackInput, String callbackButton) {
+void SensorPlot_WebInterface::interfaceConfig(String websiteTitle, String callbackInput, String callbackButton, int unixTime = 0) {
     this->websiteTitle = websiteTitle;
     this->callbackInput = callbackInput;
     this->callbackButton = callbackButton;
+    this->unixTime = unixTime;
 }
 
 void SensorPlot_WebInterface::serverResponseSetup(ESP8266WebServer *server, int (*callback)(String response)) {

@@ -86,7 +86,7 @@ void setup() {
   Serial.begin(115200);
 
   configWebInterface();
-  webInterface.interfaceConfig("Sensor Measurements", "Inputfield", "Perform Action");
+  webInterface.interfaceConfig("Sensor Measurements Title", "Inputfield", "Perform Action", 0);
   webInterface.serverResponseSetup(&server, &interfaceCallback);
   server.begin();
 
