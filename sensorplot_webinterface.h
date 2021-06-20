@@ -32,7 +32,6 @@ class SensorPlot_WebInterface {
 		String websiteTitle = "";
 		String callbackInput = "";
 		String callbackButton = "";
-        int unixTime = 0;
 
         int plotterCount = 0;
         Sensor_Plot *plotter_p[32];
@@ -43,7 +42,7 @@ class SensorPlot_WebInterface {
         void responseConfig();
         void responseGraphData();
         void responseGraphSlag(int index);
-        void responseCSV(int index);
+        void responseCSV(int index, int timestamp);
 
         void responseWidgetHTML();
         void responseWidgetJS();
@@ -51,7 +50,7 @@ class SensorPlot_WebInterface {
     public: 
         SensorPlot_WebInterface();
         void addPlot(String title, String unit, int interval, int good, int bad, int min, int max, int stepsize, int cycle, int cycleStepsize, int *valuesCount, float *values, int *valuesMeasurmentMillis);
-		void interfaceConfig(String websiteTitle, String callbackInput, String callbackButton, int unixTime);
+		void interfaceConfig(String websiteTitle, String callbackInput, String callbackButton);
         void serverResponseSetup(ESP8266WebServer *server, int (*callback)(String response));
 };
 

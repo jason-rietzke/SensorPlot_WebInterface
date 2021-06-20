@@ -83,7 +83,7 @@ void setup() {
 
   // setup webinterface
   configWebInterface();
-  webInterface.interfaceConfig("Classroom 8a", "Input", "Perform Action", 0);
+  webInterface.interfaceConfig("Classroom 8a", "Input", "Perform Action");
   webInterface.serverResponseSetup(&server, &interfaceCallback);
   server.begin();
 

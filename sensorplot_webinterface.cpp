@@ -382,8 +382,9 @@ function createGraphModule(title, unit, slag, interval, good, bad, min, max, cli
     graphModule.appendChild(headline);\n\
 \n\
     const csvLink = document.createElement('a');\n\
-    csvLink.setAttribute('href', '/csv/' + slag);\n\
-    csvLink.setAttribute('target', '_blank');\n\
+    csvLink.addEventListener('click', () => {\n\
+		window.open('./csv/' + slag + '?timestamp=' + parseInt(Date.now() / 1000), '_blank');\n\
+	});\n\
     csvLink.textContent = 'download csv';\n\
     graphModule.appendChild(csvLink);\n\
     \n\
@@ -874,11 +875,10 @@ void SensorPlot_WebInterface::addPlot(String title, String unit, int interval, i
     this->plotterCount ++;
 }
 
-void SensorPlot_WebInterface::interfaceConfig(String websiteTitle, String callbackInput, String callbackButton, int unixTime = 0) {
+void SensorPlot_WebInterface::interfaceConfig(String websiteTitle, String callbackInput, String callbackButton) {
     this->websiteTitle = websiteTitle;
     this->callbackInput = callbackInput;
     this->callbackButton = callbackButton;
-    this->unixTime = unixTime;
 }
 
 void SensorPlot_WebInterface::serverResponseSetup(ESP8266WebServer *server, int (*callback)(String response)) {
@@ -928,7 +928,11 @@ void SensorPlot_WebInterface::serverResponseSetup(ESP8266WebServer *server, int 
             responseGraphSlag(i);
         });
         this->server->on("/csv/" + String(i), [=]() {
-            responseCSV(i);
+            if (this->server->hasArg("timestamp")) {
+                responseCSV(i, this->server->arg("timestamp").toInt());
+            } else {
+                responseCSV(i, 0);
+            }
         });
     }
 }
@@ -1010,16 +1014,16 @@ void SensorPlot_WebInterface::responseGraphSlag(int index) {
     this->server->send(200, "text/plain", response);
 }
 
-void SensorPlot_WebInterface::responseCSV(int index) {
+void SensorPlot_WebInterface::responseCSV(int index, int timestamp) {
     String response;
     response = "";
 
     response += (this->plotter_p[index]->title + " (" + this->plotter_p[index]->unit + ")\n");
     response += "Time;Value\n";
     for(int i = 0; i < *(this->plotter_p[index]->valuesCount); i++) {
-        if (this->unixTime > 0) { // unix time is set
-            response += ("=((" + (String(this->unixTime + (this->plotter_p[index]->interval * i))) + "/86400) + 25569);");
-        } else { // unix time is not set
+        if (timestamp > 0) { // timestamp is set
+            response += ("=((" + (String(timestamp - (this->plotter_p[index]->interval * (*(this->plotter_p[index]->valuesCount) - i)))) + "/86400) + 25569);");
+        } else { // timestamp is not set
             response += "\"" + (String(this->plotter_p[index]->interval * i) + " sec\";");
         }
         response += "\"" + (String(this->plotter_p[index]->values[i]) + " " + this->plotter_p[index]->unit) + "\"";
