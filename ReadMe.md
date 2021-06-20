@@ -23,11 +23,10 @@ More detailed information about how to use it are here:
 
 
 #### Step 1 - configuration
-After instantiating the ESP8266WebServer and the SensorPlot_WebInterface you have to call the ``interfaceConfig("title", "input field", "perform action", unixTimestamp)`` method which takes 4 arguments.
+After instantiating the ESP8266WebServer and the SensorPlot_WebInterface you have to call the ``interfaceConfig("title", "input field", "perform action", unixTimestamp)`` method which takes 3 arguments.
 1. The Website Title, wich should be displayed in the browser
 2. Input Field, which is the placeholder text for the callback input field in the webinterface
 3. Perform Action, which is the text of the button, which triggers the callback with the input field's text as param
-4. unixTimestamp, which sets the unix timestamp when the sensoring began. If not known it should be set to 0.
 
 
 #### Step 2 - add plots
