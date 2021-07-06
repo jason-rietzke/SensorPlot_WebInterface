@@ -185,7 +185,7 @@ function createGraphModule(title, unit, slag, interval, good, bad, min, max, cli
 
 	const csvLink = document.createElement('a');
 	csvLink.addEventListener('click', () => {
-		window.open('./csv/' + slag + '?timestamp=' + parseInt(Date.now() / 1000), '_blank');
+		window.open('./csv/' + slag + '?timestamp=' + parseInt((Date.now() / 1000) - (new Date().getTimezoneOffset() * 60)), '_blank');
 	});
 	csvLink.textContent = 'download csv';
 	graphModule.appendChild(csvLink);

@@ -383,7 +383,7 @@ function createGraphModule(title, unit, slag, interval, good, bad, min, max, cli
 \n\
     const csvLink = document.createElement('a');\n\
     csvLink.addEventListener('click', () => {\n\
-		window.open('./csv/' + slag + '?timestamp=' + parseInt(Date.now() / 1000), '_blank');\n\
+		window.open('./csv/' + slag + '?timestamp=' + parseInt((Date.now() / 1000) - (new Date().getTimezoneOffset() * 60)), '_blank');\n\
 	});\n\
     csvLink.textContent = 'download csv';\n\
     graphModule.appendChild(csvLink);\n\
@@ -1018,6 +1018,11 @@ void SensorPlot_WebInterface::responseCSV(int index, int timestamp) {
     String response;
     response = "";
 
+    // If the UTF-16 Unicode byte order mark (BOM, U+FEFF) character is at the start of a UTF-8 file, the first three bytes will be 0xEF, 0xBB, 0xBF.
+    // 0xEF | B11101111 | ï
+    // 0xBB | B10111011 | »
+    // 0xBF | B10111111 | ¿
+    
     response += (this->plotter_p[index]->title + " (" + this->plotter_p[index]->unit + ")\n");
     response += "Time;Value\n";
     for(int i = 0; i < *(this->plotter_p[index]->valuesCount); i++) {
